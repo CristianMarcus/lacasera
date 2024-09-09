@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Líneas de Carrito</h1>
+  <ul>
+    {% for linea in lineas_carrito %}
+      <li>
+        <a href="{% url 'linea_carrito_detail' linea.pk %}">{{ linea }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'linea_carrito_create' %}">Crear nueva línea de carrito</a>
+{% endblock %}

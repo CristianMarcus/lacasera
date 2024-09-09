@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}Inicio - La Casera{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/global.css' %}" rel="stylesheet">
+    <!--<link rel="stylesheet" href="{% static 'css/indexcore.css' %}"-->
+{% endblock %}
+
+{% block content %}
+    <header class="my-4">
+        <h1>Bienvenido a La Casera</h1>
+        <p>¡La mejor comida a domicilio en tu área!</p>
+    </header>
+    
+    <section>
+        <h2>Nuestros Productos</h2>
+        <div class="row">
+            <!-- Ejemplo de productos, puedes llenarlo con contenido dinámico desde tu base de datos -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <img src="{% static 'images/product1.jpg' %}" class="card-img-top" alt="Producto 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Producto 1</h5>
+                        <p class="card-text">Descripción breve del producto.</p>
+                        <a href="#" class="btn btn-primary">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <img src="{% static 'images/product2.jpg' %}" class="card-img-top" alt="Producto 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Producto 2</h5>
+                        <p class="card-text">Descripción breve del producto.</p>
+                        <a href="#" class="btn btn-primary">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Agregar más productos según sea necesario -->
+        </div>
+    </section>
+{% endblock %}

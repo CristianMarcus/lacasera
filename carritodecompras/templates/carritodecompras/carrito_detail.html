@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Detalle del carrito</h1>
+  <p>Usuario: {{ carrito.usuario }}</p>
+  <a href="{% url 'carrito_update' carrito.pk %}">Editar carrito</a>
+{% endblock %}

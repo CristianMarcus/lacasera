@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Carritos</h1>
+  <ul>
+    {% for carrito in carritos %}
+      <li>
+        <a href="{% url 'carrito_detail' carrito.pk %}">{{ carrito }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'carrito_create' %}">Crear nuevo carrito</a>
+{% endblock %}
