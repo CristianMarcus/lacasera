@@ -1,10 +1,7 @@
-# core/urls.py
 from django.urls import path
 from . import views
 
-app_name='core'
-
 urlpatterns = [
-    path('', views.index, name='index'),  # URL raíz
-    
+    path('', views.index, name='index'),
+    # Otras URLs específicas de la app core
 ]

@@ -1,6 +1,6 @@
+# productos/views.py
 from django.shortcuts import render
 
-# Create your views here.
-# Definir la vista 'index'
-def index(request):
-    return render(request, 'productos/index.html')
+def menu(request):
+    # Lógica para la vista del menú
+    return render(request, 'productos/menu.html')

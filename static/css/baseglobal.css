@@ -1,0 +1,49 @@
+body {
+    background: linear-gradient( #000000,#333333,#666666, #999999, #cccccc);
+    height: 100vh; /* Asegura que el fondo cubra toda la altura de la página */
+    margin: 0;
+}
+header {
+    margin: 15px;
+    border: 15px;
+    color: #666666;
+    padding: 10px 20px;
+
+}
+/* Navigation menu styles */
+nav {
+    display: flex;
+    justify-content: space-between; /* Alinea los items con espacio entre ellos */
+}
+/* Menu list styles */
+ul.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Flexbox para alinear los items en fila */
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Menu items styles */
+ul.menu li {
+    margin-right: 20px;
+}
+
+ul.menu li:last-child {
+    margin-right: 0; /* Quitar margen al último item */
+}
+
+/* Links styles */
+ul.menu li a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 20px;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+ul.menu li a:hover {
+    background-color: #575757;
+}
+

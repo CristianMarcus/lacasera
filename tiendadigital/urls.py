@@ -1,15 +1,19 @@
 from django.contrib import admin
 from django.urls import path, include
-from core import views as core_views
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),  # URL raíz dirigida a la aplicación `core`
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('', include('core.urls')),  # Enlaza con las URLs de la app core
     path('usuarios/', include('usuarios.urls')),
-    path('productos/', include('productos.urls')),
-    path('carritodecompras/', include('carritodecompras.urls')),
-    path('pagos/', include('pagos.urls')),
-    path('pedidos/', include('pedidos.urls')),
-    path('promoOfertas/', include('promoOfertas.urls')),
-    path('historialcompras/', include('historialcompras.urls')),
+    path('productos/', include('productos.urls')),  # Enlaza con las URLs de la app productos
+    path('carrito/', include('carritodecompras.urls')),  # Enlaza con las URLs de la app carrito
+    path('pagos/', include('pagos.urls')),  # Enlaza con las URLs de la app pagos
+    path('pedidos/', include('pedidos.urls')),  # Enlaza con las URLs de la app pedidos
+    path('promoOfertas/', include('promoOfertas.urls')),  # Enlaza con las URLs de la app promoOfertas
+    path('historialcompras/', include('historialcompras.urls')),  # Enlaza con las URLs de la app historialcompras
+    
+    
 ]

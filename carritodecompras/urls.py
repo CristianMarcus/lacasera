@@ -2,13 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('carritos/', views.CarritoListView.as_view(), name='carrito_list'),
-    path('carritos/<int:pk>/', views.CarritoDetailView.as_view(), name='carrito_detail'),
-    path('carritos/create/', views.CarritoCreateView.as_view(), name='carrito_create'),
-    path('carritos/<int:pk>/update/', views.CarritoUpdateView.as_view(), name='carrito_update'),
-    
-    path('lineas-carrito/', views.LineaCarritoListView.as_view(), name='linea_carrito_list'),
-    path('lineas-carrito/<int:pk>/', views.LineaCarritoDetailView.as_view(), name='linea_carrito_detail'),
-    path('lineas-carrito/create/', views.LineaCarritoCreateView.as_view(), name='linea_carrito_create'),
-    path('lineas-carrito/<int:pk>/update/', views.LineaCarritoUpdateView.as_view(), name='linea_carrito_update'),
+    path('', views.carrito, name='carrito'),
+    path('agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+    path('eliminar/<int:producto_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
+    # Otras URLs específicas de la app carrito
 ]

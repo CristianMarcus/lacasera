@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-
-{% block content %}
-  <h1>Detalle de la línea de carrito</h1>
-  <p>Carrito: {{ linea_carrito.carrito }}</p>
-  <p>Producto: {{ linea_carrito.producto }}</p>
-  <p>Cantidad: {{ linea_carrito.cantidad }}</p>
-  <a href="{% url 'linea_carrito_update' linea_carrito.pk %}">Editar línea de carrito</a>
-{% endblock %}

@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from django.template import Context, Template
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +29,8 @@ SECRET_KEY = 'django-insecure-1k4dn%_ul3qmebbed4^ug!)32uj77#f)m*2(3y-(np-4h+z0%5
 DEBUG = True
 
 ALLOWED_HOSTS = []
+LOGIN_URL = '/accounts/login/'  # Asegúrate de que coincida con tu URL de inicio de sesión
+
 
 
 # Application definition
@@ -63,7 +68,7 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,12 +76,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
-                #'carritodecompras.context_processors.carrito_total',  # Nombre correcto
+                'carritodecompras.context_processors.carrito_context',  # Añadir aquí el procesador de contexto
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'tiendadigital.wsgi.application'
 
@@ -119,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 
 # Internationalization
@@ -138,6 +144,9 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
 
 # Definir las apps que tienen carpetas `static`
 APPS_WITH_STATIC = [
