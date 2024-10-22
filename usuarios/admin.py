@@ -1,21 +1,26 @@
 from django.contrib import admin
-
-# Register your models here.
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Usuario
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
-class UsuarioAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
     model = Usuario
-    # Aquí puedes personalizar la forma en que se muestran los campos en el admin
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('custom_field',)}),  # Agrega campos personalizados aquí
+    list_display = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'is_staff', 'is_active']
+    list_filter = ['is_staff', 'is_active']
+    fieldsets = (
+        (None, {'fields': ('username', 'email', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'phone_number', 'address')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'groups', 'user_permissions')}),
     )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {'fields': ('custom_field',)}),  # Agrega campos personalizados en el formulario de creación
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'phone_number', 'address', 'password1', 'password2', 'is_staff', 'is_active')}
+        ),
     )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    search_fields = ('username', 'email')
-    ordering = ('username',)
+    search_fields = ('email', 'username', 'first_name', 'last_name')
+    ordering = ('email',)
 
-admin.site.register(Usuario, UsuarioAdmin)
+admin.site.register(Usuario, CustomUserAdmin)

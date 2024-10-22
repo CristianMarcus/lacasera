@@ -1,49 +1,121 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Carrito, LineaCarrito
-from productos.models import Producto  # Asegúrate de que esto apunte correctamente a tus modelos
+# carritodecompras/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required  # Importa el decorador
+from productos.models import Producto
+from .models import LineaCarrito
+from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
 
-@login_required  # Redirige a la página de inicio de sesión si el usuario no está autenticado
-def carrito(request):
-    # Lógica para mostrar el carrito de compras
-    carrito = Carrito.objects.filter(usuario=request.user).first()  # Busca el carrito del usuario
-    lineas_carrito = LineaCarrito.objects.filter(carrito=carrito) if carrito else []  # Evita errores si el carrito es None
-    return render(request, 'carritodecompras/carrito.html', {'lineas_carrito': lineas_carrito})
+# VISTAS PARA USUARIOS AUTENTICADOS
+@login_required
+def ver_carrito(request):
+    """
+    Vista que muestra el carrito de compras para usuarios autenticados.
+    Obtiene el carrito del usuario autenticado y lista los productos dentro de él,
+    calculando el total de artículos y el total de precio.
+    """
+    carrito = obtener_carrito_usuario(request)
+    lineas = LineaCarrito.objects.filter(carrito=carrito)
+    
+    total_items = sum(linea.cantidad for linea in lineas)
+    total_precio = sum(linea.producto.precio * linea.cantidad for linea in lineas)
 
-@login_required  # Asegúrate de que solo los usuarios autenticados puedan agregar al carrito
+    return render(request, 'carritodecompras/ver_carrito.html', {
+        'lineas': lineas,
+        'total_items': total_items,
+        'total_precio': total_precio
+    })
+
+@login_required
 def agregar_al_carrito(request, producto_id):
+    """
+    Vista que agrega un producto al carrito para usuarios autenticados.
+    Si el producto ya existe en el carrito, aumenta la cantidad. Si no existe, lo agrega con cantidad 1.
+    """
     producto = get_object_or_404(Producto, id=producto_id)
-    carrito = Carrito.objects.filter(usuario=request.user).first()  # Busca el carrito del usuario
-    if not carrito:
-        carrito = Carrito(usuario=request.user)
-        carrito.save()
-    linea_carrito, created = LineaCarrito.objects.get_or_create(
-        carrito=carrito, producto=producto,
-        defaults={'cantidad': 1}
-    )
+    carrito = obtener_carrito_usuario(request)
+    
+    # Obtiene la línea del carrito o la crea si no existe
+    linea, created = LineaCarrito.objects.get_or_create(carrito=carrito, producto=producto)
+    
+    # Solo aumenta la cantidad si la línea ya existía
     if not created:
-        linea_carrito.cantidad += 1
-        linea_carrito.save()
-    messages.success(request, f'Producto {producto.nombre} agregado al carrito.')
-    return redirect('carrito')
+        linea.cantidad += 1
+    
+    linea.save()
 
-@login_required  # Asegúrate de que solo los usuarios autenticados puedan eliminar del carrito
-def eliminar_del_carrito(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
-    carrito = Carrito.objects.filter(usuario=request.user).first()  # Busca el carrito del usuario
-    if carrito:
-        try:
-            linea_carrito = LineaCarrito.objects.get(carrito=carrito, producto=producto)
-            linea_carrito.delete()
-            messages.success(request, f'Producto {producto.nombre} eliminado del carrito.')
-        except LineaCarrito.DoesNotExist:
-            messages.error(request, 'El producto no está en el carrito.')
+    messages.success(request, f'{producto.nombre} fue agregado al carrito.')
+    return redirect('ver_carrito')
+
+
+@login_required
+def eliminar_producto(request, producto_id):
+    """
+    Vista que elimina un producto del carrito para usuarios autenticados.
+    Si el producto tiene más de una unidad en el carrito, disminuye la cantidad.
+    Si solo queda una unidad, la elimina completamente.
+    """
+    carrito = obtener_carrito_usuario(request)
+    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
+
+    if linea.cantidad > 1:
+        linea.cantidad -= 1
+        linea.save()
     else:
-        messages.error(request, 'No tienes un carrito activo.')
-    return redirect('carrito')
-###Decorador login_required: He añadido el decorador @login_required a cada vista para asegurarnos de que solo los usuarios autenticados puedan acceder a estas funciones. Si un usuario no está autenticado, será redirigido a la página de inicio de sesión.
+        linea.delete()
 
-#Manejo de carrito vacío: En la vista carrito, se agregó una verificación para asegurar que lineas_carrito sea una lista vacía si carrito es None. Esto evita errores si el usuario no tiene un carrito creado.
+    messages.success(request, 'Producto eliminado del carrito.')
+    return redirect('ver_carrito')
 
-#Manejo de errores en eliminar_del_carrito: Se añadió un mensaje de error si el usuario no tiene un carrito activo.
+
+# VISTAS PARA USUARIOS NO AUTENTICADOS (CARRO EN SESIÓN)
+def ver_carrito_sesion(request):
+    """
+    Vista que muestra el carrito de compras para usuarios no autenticados.
+    El carrito se maneja dentro de la sesión del usuario.
+    """
+    carrito = request.session.get('carrito', {})
+    total_carrito = sum(item['total_precio'] for item in carrito.values())
+
+    return render(request, 'carritodecompras/ver_carrito_sesion.html', {
+        'carrito': carrito,
+        'total_carrito': total_carrito
+    })
+
+def agregar_producto_sesion(request, producto_id):
+    """
+    Vista que agrega un producto al carrito para usuarios no autenticados.
+    El carrito se guarda en la sesión del usuario.
+    """
+    producto = get_object_or_404(Producto, id=producto_id)
+    cantidad = int(request.POST.get('cantidad', 0))
+    
+    if cantidad <= 0:
+        messages.error(request, "La cantidad debe ser mayor que cero.")
+        return redirect('ver_carrito_sesion')
+
+    # Asegúrate de manejar la situación donde el producto ya existe en la sesión
+    carrito = actualizar_sesion_carrito(request, producto, cantidad)
+    messages.success(request, f"{producto.nombre} fue agregado al carrito.")
+    return redirect('ver_carrito_sesion')
+
+def eliminar_producto_sesion(request, producto_id):
+    """
+    Vista que elimina un producto del carrito para usuarios no autenticados.
+    El carrito se maneja en la sesión, y si el producto tiene más de una unidad, disminuye la cantidad;
+    si solo queda una unidad, lo elimina completamente del carrito en la sesión.
+    """
+    carrito = request.session.get('carrito', {})
+    producto_id = str(producto_id)
+
+    if producto_id in carrito:
+        if carrito[producto_id]['cantidad'] > 1:
+            carrito[producto_id]['cantidad'] -= 1
+            carrito[producto_id]['total_precio'] = float(carrito[producto_id]['precio']) * carrito[producto_id]['cantidad']
+        else:
+            del carrito[producto_id]
+
+        request.session['carrito'] = carrito
+        messages.success(request, 'Producto eliminado del carrito.')
+
+    return redirect('ver_carrito_sesion')

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Menú de Productos</h1>
+    <div class="row">
+        {% for producto in productos %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <!-- Verificamos si el producto tiene una imagen -->
+                {% if producto.imagen and producto.imagen.name %}
+                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                {% else %}
+                <!-- Mostrar imagen predeterminada si no hay imagen -->
+                <img src="{% static 'productos/img/default.jpg' %}" class="card-img-top" alt="Imagen no disponible">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text">{{ producto.descripcion }}</p>
+                    <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+                    <form method="post" action="{% url 'agregar_al_carrito' producto.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                        <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

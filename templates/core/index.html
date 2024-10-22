@@ -2,6 +2,10 @@
 
 {% block title %}Inicio{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}  <!-- Mantiene el contenido del bloque base -->
+{% endblock %}
+
 {% block content %}
 <header>
     <h1>Bienvenido a La Casera</h1>

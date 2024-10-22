@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Productos{% endblock %}
+
+{% block content %}
+    <h1>Lista de Productos</h1>
+    <a href="{% url 'crear_producto' %}" class="btn btn-success">Nuevo Producto</a>
+    <ul>
+        {% for producto in productos %}
+            <li>
+                <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a> 
+                - {{ producto.precio }}$
+                <a href="{% url 'editar_producto' producto.id %}" class="btn btn-warning">Editar</a>
+                <form action="{% url 'eliminar_producto' producto.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

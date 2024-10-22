@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<h1>Tu Carrito</h1>
+
+{% if lineas %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for linea in lineas %}
+                <tr>
+                    <td>{{ linea.producto.nombre }}</td>
+                    <td>{{ linea.cantidad }}</td>
+                    <td>${{ linea.producto.precio }}</td>
+                    <td>${{ linea.producto.precio|multiply:linea.cantidad }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="totales">
+        <h4>Total de artículos: {{ total_items }}</h4>
+        <h4>Total a pagar: ${{ total_precio }}</h4>
+    </div>
+{% else %}
+    <p>Tu carrito está vacío.</p>
+{% endif %}
+{% endblock %}

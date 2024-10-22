@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Detalles del Pedido #{{ pedido.id }}</h2>
+<ul>
+    {% for linea in pedido.lineapedido_set.all %}
+        <li>{{ linea.producto.nombre }} - {{ linea.cantidad }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'listar_pedidos' %}">Volver a Mis Pedidos</a>
+{% endblock %}

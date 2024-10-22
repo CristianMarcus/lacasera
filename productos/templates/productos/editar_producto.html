@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form.instance.id|default:"Crear" }} Producto{% endblock %}
+
+{% block content %}
+    <h1>{{ form.instance.id|default:"Crear" }} Producto</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+    <a href="{% url 'listar_productos' %}" class="btn btn-primary">Volver a la lista</a>
+{% endblock %}

@@ -1,0 +1,98 @@
+/* Estilo para el header */
+header {
+    background-color: #814141; /* Color ladrillo */
+    color: #e9e3e3; /* Color claro para el texto */
+    padding: 20px; /* Espacio interno */
+    text-align: center; /* Centrar el texto */
+}
+
+header h1 {
+    margin: 0; /* Sin margen */
+    font-size: 2em; /* Tamaño del texto del encabezado */
+}
+
+/* Estilo para la barra de navegación */
+nav ul.menu {
+    background-color: #814141; /* Color ladrillo */
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+nav ul.menu li {
+    display: inline;
+}
+
+nav ul.menu li a {
+    color: #e9e3e3; /* Color claro para el texto */
+    text-decoration: none;
+    padding: 15px 20px;
+    display: inline-block;
+    transition: background-color 0.3s; /* Transición suave al cambiar el fondo */
+}
+
+nav ul.menu li a:hover {
+    background-color: #6e0e0e; /* Color ladrillo más oscuro al pasar el ratón */
+}
+
+/* Estilo para el footer */
+footer {
+    background-color: #814141; /* Color del footer */
+    color: #e9e3e3;
+    text-align: center;
+    padding: 15px 0;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Tabla de productos */
+table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #814141; /* Color ladrillo */
+    color: white;
+}
+
+table td {
+    background-color: #f5f5f5;
+}
+
+/* Botón de finalizar compra */
+.btn-success {
+    background-color: #814141;
+    border-color: #814141;
+    color: #ffffff; /* Color del texto en el botón */
+}
+
+.btn-success:hover {
+    background-color: #6e0e0e;
+    border-color: #6e0e0e;
+}
+
+/* Flexbox para asegurar que el footer se mantenga en la parte inferior */
+.d-flex {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+/* Añadir un poco de estilo a los encabezados */
+h3 {
+    color: #814141; /* Color ladrillo para subtítulos */
+}

@@ -1,21 +1,17 @@
-from carritodecompras.models import CarritoItem
+# carritodecompras/context_processors.py
+
+from django.contrib.auth.models import AnonymousUser
+from .models import Carrito  # Asegúrate de que este es el modelo correcto
+from .models import CarritoItem  # Asegúrate de que este modelo esté definido
 
 def carrito_context(request):
-    # Si el usuario no está autenticado, el carrito estará vacío
-    if not request.user.is_authenticated:
-        return {'total_items': 0, 'total_precio': 0}
-
-    # Obtener los elementos del carrito del usuario autenticado
-    carrito_items = CarritoItem.objects.filter(usuario=request.user)
-
-    # Calcular el número total de productos en el carrito
-    total_items = sum(item.cantidad for item in carrito_items)
-
-    # Calcular el precio total del carrito
-    total_precio = sum(item.producto.precio * item.cantidad for item in carrito_items)
-
-    # Devolver los datos al contexto
+    carrito_items = []  # Inicializamos carrito_items como una lista vacía
+    if request.user.is_authenticated:
+        try:
+            carrito = Carrito.objects.get(usuario=request.user)
+            carrito_items = carrito.carritoitem_set.all()  # Obtener los items del carrito
+        except Carrito.DoesNotExist:
+            carrito_items = []  # Si no existe el carrito, aseguramos que esté vacío
     return {
-        'total_items': total_items,
-        'total_precio': total_precio
+        'carrito_items': carrito_items,
     }

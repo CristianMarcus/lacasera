@@ -1,6 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+# urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+
+
+
+
+
 
 
 urlpatterns = [
@@ -14,6 +22,12 @@ urlpatterns = [
     path('pedidos/', include('pedidos.urls')),  # Enlaza con las URLs de la app pedidos
     path('promoOfertas/', include('promoOfertas.urls')),  # Enlaza con las URLs de la app promoOfertas
     path('historialcompras/', include('historialcompras.urls')),  # Enlaza con las URLs de la app historialcompras
+    
+
+
+ 
+
+
     
     
 ]

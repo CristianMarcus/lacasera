@@ -1,12 +1,10 @@
 from django.db import models
 from productos.models import Producto
 from usuarios.models import Usuario
-
-from django.db import models
-from usuarios.models import Usuario
-from productos.models import Producto
-
 from django.utils import timezone
+from django.conf import settings
+
+
 
 class Carrito(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
@@ -22,12 +20,10 @@ class LineaCarrito(models.Model):
 
     def __str__(self):
         return f'{self.cantidad} x {self.producto.nombre}'
-
-
+    
 class CarritoItem(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.PositiveIntegerField(default=1)
+    carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE)
+    producto = models.ForeignKey('productos.Producto', on_delete=models.CASCADE)  # Asegúrate de que el modelo Producto esté definido
+    cantidad = models.PositiveIntegerField(default=1)    
 
-    def __str__(self):
-        return f'{self.producto.nombre} - {self.cantidad} unidades'
+
