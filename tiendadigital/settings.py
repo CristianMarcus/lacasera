@@ -49,8 +49,10 @@ ROOT_URLCONF = 'tiendadigital.urls'
 WSGI_APPLICATION = 'tiendadigital.wsgi.application'
 
 # Modelo de usuario personalizado
+AUTH_USER_MODEL = 'auth.User'  # Reemplazá esto si tenés un modelo de usuario personalizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
-AUTH_USER_MODEL = 'usuarios.Usuario'
+
+
 
 
 # Configuración de plantillas
@@ -97,20 +99,14 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Configuración de archivos estáticos
-STATIC_URL = '/static/'
-
-# Rutas adicionales de archivos estáticos
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Carpeta estática global
-]
-
-# Los archivos estáticos dentro de las aplicaciones se detectan automáticamente
-# gracias a 'django.contrib.staticfiles' y 'APP_DIRS': True
-
-# Configuración de archivos multimedia
+# settings.py
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
 
 # Campo de clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

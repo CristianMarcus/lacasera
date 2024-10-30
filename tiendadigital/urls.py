@@ -22,12 +22,5 @@ urlpatterns = [
     path('pedidos/', include('pedidos.urls')),  # Enlaza con las URLs de la app pedidos
     path('promoOfertas/', include('promoOfertas.urls')),  # Enlaza con las URLs de la app promoOfertas
     path('historialcompras/', include('historialcompras.urls')),  # Enlaza con las URLs de la app historialcompras
-    
-
-
- 
-
-
-    
-    
-]
+       
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

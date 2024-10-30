@@ -8,11 +8,10 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <!-- Verificamos si el producto tiene una imagen -->
-                {% if producto.imagen and producto.imagen.name %}
-                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                {% if producto.imagen.has_pic %}
+                <img src="{{ producto.imagen.url }}" alt="Imagen del producto">
                 {% else %}
-                <!-- Mostrar imagen predeterminada si no hay imagen -->
-                <img src="{% static 'productos/img/default.jpg' %}" class="card-img-top" alt="Imagen no disponible">
+                <p>No hay imagen disponible.</p>
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
@@ -30,4 +29,3 @@
     </div>
 </div>
 {% endblock %}
-

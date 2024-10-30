@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/baseglobal.css' %}">
+    <link rel="stylesheet" href="{% static 'productos/css/menustyle.css' %}">
+    {% endblock %}
 
 {% block content %}
 <div class="container">
@@ -7,7 +13,14 @@
         {% for producto in productos %}
         <div class="col-md-4">
             <div class="card mb-4">
-                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                <!-- Verificamos si el producto tiene una imagen -->
+                {% if producto.imagen and producto.imagen.url %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid">
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No hay imagen disponible para este producto.
+                </div>
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
                     <p class="card-text">{{ producto.descripcion }}</p>
