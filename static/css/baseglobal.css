@@ -36,6 +36,11 @@ ul.menu {
     padding: 0;
     display: flex; /* Alinea los ítems en fila */
 }
+.img-thumbnail {
+    width: 200px; /* Ajustá esto al tamaño deseado */
+    height: auto; /* Mantén la proporción de la imagen */
+}
+
 
 /* Menu Items Styles */
 ul.menu li {
@@ -71,6 +76,19 @@ color: rgb(184, 56, 184);
 .container {
     flex-grow: 1; /* Hace que el contenido crezca y empuje el footer hacia abajo */
 }
+.card {
+    height: 100%; /* Hace que todas las tarjetas tengan la misma altura */
+}
+
+.card-img-top {
+    object-fit: cover;
+    height: 200px; /* Ajustá esto según el tamaño que quieras para tus imágenes */
+    width: 100%;
+    
+}
+div .card.mb
+
+
 
 /* Footer Styles */
 footer {

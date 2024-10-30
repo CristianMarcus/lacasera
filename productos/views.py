@@ -54,3 +54,14 @@ def eliminar_producto(request, producto_id):
         messages.success(request, 'Producto eliminado exitosamente.')
         return redirect('listar_productos')
     return render(request, 'productos/confirmar_eliminacion.html', {'producto': producto})
+
+
+def crear_producto(request):
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_productos')
+    else:
+        form = ProductoForm()
+    return render(request, 'productos/crear_producto.html', {'form': form})
