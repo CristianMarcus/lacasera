@@ -1,0 +1,14 @@
+<!--Template para Pago con MercadoPago-->
+{% extends 'base.html' %}
+
+{% block title %}Pago con MercadoPago{% endblock %}
+
+{% block content %}
+<form action="{% url 'procesar_pago_mercadopago' pedido.id %}" method="post">
+    {% csrf_token %}
+    <script
+        src="https://www.mercadopago.com.ar/integrations/v1/web-payment-checkout.js"
+        data-preference-id="{{ preference_id }}">
+    </script>
+</form>
+{% endblock %}

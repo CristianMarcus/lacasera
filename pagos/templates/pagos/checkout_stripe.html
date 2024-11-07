@@ -1,0 +1,20 @@
+<!--Template para Pago con Stripe-->
+{% extends 'base.html' %}
+
+{% block title %}Pago con Tarjeta{% endblock %}
+
+{% block content %}
+<form action="{% url 'procesar_pago_stripe' pedido.id %}" method="post">
+    {% csrf_token %}
+    <script
+        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+        data-key="{{ stripe_key }}"
+        data-amount="{{ pedido.total|floatformat:2|replace:'.','' }}"
+        data-name="La Casera"
+        data-description="Compra en La Casera - Pedido #{{ pedido.id }}"
+        data-image="https://example.com/tu_logo.png"
+        data-locale="auto"
+        data-currency="usd">
+    </script>
+</form>
+{% endblock %}

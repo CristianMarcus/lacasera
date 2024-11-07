@@ -1,12 +1,12 @@
-# carritodecompras/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from productos.models import Producto
-from .models import LineaCarrito
+from .models import LineaCarrito, Carrito
 from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
 
 # VISTAS PARA USUARIOS AUTENTICADOS
+
 @login_required
 def ver_carrito(request):
     """
@@ -45,8 +45,7 @@ def agregar_al_carrito(request, producto_id):
     linea.save()
 
     messages.success(request, f'{producto.nombre} fue agregado al carrito.')
-    return redirect('ver_carrito')
-
+    return redirect('carrito')
 
 @login_required
 def eliminar_producto(request, producto_id):
@@ -65,10 +64,10 @@ def eliminar_producto(request, producto_id):
         linea.delete()
 
     messages.success(request, 'Producto eliminado del carrito.')
-    return redirect('ver_carrito')
-
+    return redirect('carrito')
 
 # VISTAS PARA USUARIOS NO AUTENTICADOS (CARRO EN SESIÓN)
+
 def ver_carrito_sesion(request):
     """
     Vista que muestra el carrito de compras para usuarios no autenticados.

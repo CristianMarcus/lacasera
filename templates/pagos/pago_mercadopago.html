@@ -1,0 +1,17 @@
+<!-- templates/pagos/pago_mercadopago.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Procesar Pago{% endblock %}
+
+{% block content %}
+<h1>Procesar Pago con MercadoPago</h1>
+<form action="/procesar_pago_mercadopago/{{ pedido.id }}/" method="post" id="form-checkout">
+    {% csrf_token %}
+    <script
+        src="https://sdk.mercadopago.com/js/v2"
+        data-preference-id="{{ preference_id }}">
+    </script>
+    <button type="submit">Pagar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+<!--template para error.html-->
+{% extends 'base.html' %}
+
+{% block title %}Error en el Pago{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <h1>Hubo un problema con tu pago</h1>
+    <p>Lamentablemente, no se pudo procesar tu pago. Por favor, intentá de nuevo.</p>
+    <a href="{% url 'checkout' %}" class="btn btn-primary">Volver a intentar</a>
+</section>
+{% endblock %}

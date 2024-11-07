@@ -4,7 +4,13 @@ from django.db import models
 # HistorialCompras - models.py
 from django.db import models
 from usuarios.models import Usuario
-from pedidos.models import Pedido
+from pagos.models import Pedido
+# historialcompras/models.py
+
+from pagos.models import Pedido  # Actualiza esta línea
+
+# Otros modelos y código aquí...
+
 
 class HistorialCompra(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

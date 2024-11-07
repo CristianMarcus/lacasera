@@ -1,0 +1,19 @@
+<!-- templates/pagos/pago_stripe.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Procesar Pago{% endblock %}
+
+{% block content %}
+<h1>Procesar Pago con Stripe</h1>
+<form action="{% url 'procesar_pago_stripe' pedido.id %}" method="post">
+    {% csrf_token %}
+    <!-- Aquí va el código del formulario de Stripe -->
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="{{ STRIPE_PUBLIC_KEY }}"
+            data-amount="{{ pedido.total|floatformat:2|floatformat:0 }}"
+            data-name="La Casera"
+            data-description="Pago por Pedido {{ pedido.id }}"
+            data-currency="usd"></script>
+</form>
+{% endblock %}

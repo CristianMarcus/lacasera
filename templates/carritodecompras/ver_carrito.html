@@ -36,6 +36,13 @@
         <h4>Total de artículos: {{ total_items }}</h4>
         <h4>Total a pagar: ${{ total_precio }}</h4>
     </div>
+
+    <!-- Botón para procesar el pago -->
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <form method="GET" action="{% url 'checkout' %}">
+            <button type="submit" class="btn btn-primary btn-lg">Procesar Pago</button>
+        </form>
+    </div>
 {% else %}
     <p>Tu carrito está vacío.</p>
 {% endif %}

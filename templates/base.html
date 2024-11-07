@@ -17,7 +17,7 @@
             <ul class="menu">
                 <li><a href="{% url 'index' %}">Inicio</a></li>
                 <li><a href="{% url 'menu' %}">Menú</a></li>
-                <li><a href="{% url 'ver_carrito' %}">Ver Carrito</a></li>
+                <li><a href="{% url 'carrito' %}">Ver Carrito</a></li>
 
                 {% if user.is_authenticated %}
                     <li class="msjhome">Bienvenido, {{ user.username }}!</li>

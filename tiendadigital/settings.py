@@ -125,3 +125,15 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'danger',
 }
+# settings.py
+
+# Claves de API de Stripe
+STRIPE_SECRET_KEY = 'tu_secret_key'
+STRIPE_PUBLISHABLE_KEY = 'tu_publishable_key'
+
+
+
+# Claves de API de MercadoPago
+MERCADOPAGO_PUBLIC_KEY = 'tu_public_key'
+MERCADOPAGO_ACCESS_TOKEN = 'tu_access_token'
+

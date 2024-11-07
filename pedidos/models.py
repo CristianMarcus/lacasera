@@ -1,26 +1,26 @@
+# pedidos/models.py
+
 from django.db import models
-from usuarios.models import Usuario
-from productos.models import Producto
-from django.core.exceptions import ValidationError
+from carritodecompras.models import Producto
+from django.conf import settings
 
 class Pedido(models.Model):
-    ESTADO_CHOICES = [
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='pedidos_pedidos')
+    fecha_pedido = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=50, choices=[
         ('Pendiente', 'Pendiente'),
         ('En Proceso', 'En Proceso'),
         ('Enviado', 'Enviado'),
         ('Entregado', 'Entregado'),
         ('Cancelado', 'Cancelado'),
-    ]
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    fecha_pedido = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=50, choices=ESTADO_CHOICES, default='Pendiente')
+    ], default='Pendiente')
 
     def __str__(self):
         return f"Pedido {self.id} de {self.usuario.username}"
 
 class LineaPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='lineas_pedido_pedidos')
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lineas_pedido_pedidos')
     cantidad = models.IntegerField()
 
     def clean(self):

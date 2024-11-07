@@ -1,0 +1,13 @@
+<!--Template para Éxito-->
+{% extends 'base.html' %}
+
+{% block title %}Pago Exitoso{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <h1>¡Gracias por tu compra!</h1>
+    <p>Tu pago ha sido procesado con éxito.</p>
+    <a href="{% url 'index' %}" class="btn btn-primary">Volver a la página principal</a>
+</section>
+{% endblock %}
+
