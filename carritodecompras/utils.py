@@ -1,13 +1,10 @@
 # carritodecompras/utils.py
+
 from .models import Carrito
 
-
-
 def obtener_carrito_usuario(request):
-    usuario = request.user
-    carrito, created = Carrito.objects.get_or_create(usuario=usuario)
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
     return carrito
-
 
 def actualizar_sesion_carrito(request, producto, cantidad):
     carrito = request.session.get('carrito', {})

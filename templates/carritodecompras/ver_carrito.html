@@ -1,34 +1,55 @@
 {% extends 'base.html' %}
-{% load custom_filters %}
+
+{% block title %}Carrito de Compras{% endblock %}
 
 {% block content %}
-<h1>Tu Carrito</h1>
-
-{% if lineas %}
-    <table class="table">
-        <thead>
+{% load custom_filters %}
+<div class="container mt-5">
+    <h1>Carrito de Compras</h1>
+    <table class="table table-hover">
+        <thead class="thead-light">
             <tr>
                 <th>Producto</th>
                 <th>Cantidad</th>
-                <th>Precio</th>
+                <th>Precio Unitario</th>
                 <th>Total</th>
-                <th>Acción</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for linea in lineas %}
-                <tr>
-                    <td>{{ linea.producto.nombre }}</td>
-                    <td>{{ linea.cantidad }}</td>
-                    <td>${{ linea.producto.precio }}</td>
-                    <td>${{ linea.producto.precio|multiply:linea.cantidad }}</td>
-                    <td>
-                        <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    {% if linea.producto %}
+                        {{ linea.producto.nombre }}
+                    {% else %}
+                        Producto eliminado
+                    {% endif %}
+                </td>
+                <td>{{ linea.cantidad }}</td>
+                <td>
+                    {% if linea.producto %}
+                        ${{ linea.producto.precio }}
+                    {% else %}
+                        $0
+                    {% endif %}
+                </td>
+                <td>
+                    {% if linea.producto %}
+                        ${{ linea.producto.precio|multiply:linea.cantidad }}
+                    {% else %}
+                        $0
+                    {% endif %}
+                </td>
+                <td>
+                    {% if linea.producto %}
+                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -36,14 +57,18 @@
         <h4>Total de artículos: {{ total_items }}</h4>
         <h4>Total a pagar: ${{ total_precio }}</h4>
     </div>
-
-    <!-- Botón para procesar el pago -->
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <form method="GET" action="{% url 'checkout' %}">
-            <button type="submit" class="btn btn-primary btn-lg">Procesar Pago</button>
+    <div class="botones-de-pago d-flex justify-content-between">
+        <!-- Botón de Stripe -->
+        <form action="{% url 'procesar_pago_stripe' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Pagar con Stripe</button>
+        </form>
+        <!-- Botón de Mercado Pago -->
+        <form action="{% url 'procesar_pago_mp' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
         </form>
     </div>
-{% else %}
-    <p>Tu carrito está vacío.</p>
-{% endif %}
+    <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
+</div>
 {% endblock %}

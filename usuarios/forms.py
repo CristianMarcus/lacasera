@@ -1,4 +1,3 @@
-# usuarios/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import Usuario
@@ -25,6 +24,14 @@ class CustomUserCreationForm(UserCreationForm):
             'password1': None, # Elimina el texto de ayuda para la contraseña
             'password2': None, # Elimina el texto de ayuda para la confirmación de contraseña
         }
+
+    def save(self, commit=True):
+        user = super(CustomUserCreationForm, self).save(commit=False)
+        user.is_staff = False  # Asegúrate de que no sea staff
+        user.is_superuser = False  # Asegúrate de que no sea superusuario
+        if commit:
+            user.save()
+        return user
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta:

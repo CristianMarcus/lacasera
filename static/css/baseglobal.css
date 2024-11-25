@@ -1,20 +1,36 @@
+/* baseglobal.css */
+
 /* General Body Styles */
 body {
-    background-color: #2e0808; 
-    margin: 0;
+    background-image: url('/static/productos/img/40a13a4df7150f3e57b358a92741ea43.jpg');
+    background-size: cover; /* Ajusta la imagen para cubrir todo el área */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-color: white; 
+    margin: 1;
     font-family: Arial, sans-serif;
-    color: #ffffff; /* Texto blanco para contraste */
+    color: #302f2f; /* Texto blanco para contraste */
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* Hace que el body ocupe al menos toda la pantalla */
 }
 
+/* Estilos para el logo */ 
+.logo { 
+    width: 150px; /* Ajusta el ancho del logo */
+    height: auto; /* Mantiene la proporción del logo */
+    margin-right: 20px; /* Añade un margen a la derecha */
+    vertical-align: middle; /* Alinea verticalmente el logo con los enlaces */
+    border-radius: 5px;
+}
+
 /* Header Styles */
 header {
-    margin: 0; /* Eliminado margen superior */
+    margin: 5px; /* Eliminado margen superior */
     padding: 10px 20px;
     text-align: center;
-    background-color: #2e0808; /* Fondo oscuro */
+    background-color: rgb(22, 22, 121);
+    border-radius: 10px;
 }
 
 /* Navigation Styles */
@@ -22,10 +38,10 @@ nav {
     display: flex;
     justify-content: center; /* Centra el menú horizontalmente */
     padding: 10px 0;
-    box-shadow: 3px 4px 3px 4px rgba(202, 5, 5, 0.3); /* Sombra sutil */
-    background-color:transparent ;
+    box-shadow: 3px 4px 3px 4px rgba(25, 5, 202, 0.3); /* Sombra sutil */
+    background-color: transparent;
 }
-nav button{
+nav button {
     margin: 5px;
     background-color: rgb(238, 236, 206);
 }
@@ -37,10 +53,9 @@ ul.menu {
     display: flex; /* Alinea los ítems en fila */
 }
 .img-thumbnail {
-    width: 200px; /* Ajustá esto al tamaño deseado */
+    width: 200px; /* Ajusta esto al tamaño deseado */
     height: auto; /* Mantén la proporción de la imagen */
 }
-
 
 /* Menu Items Styles */
 ul.menu li {
@@ -54,48 +69,81 @@ ul.menu li:last-child {
 /* Link Styles */
 ul.menu li a {
     text-decoration: none; /* Quita subrayado */
-    color: rgb(160, 155, 140); /* Texto blanco */
+    color: blue; /* Texto blanco */
     padding: 10px 20px;
     display: block;
     transition: background-color 0.3s ease-in-out;
     border-radius: 20px;
-    background-color: #7c2828; /* Fondo predeterminado */
+    background-color: transparent; /* Fondo predeterminado */
 }
 
 ul.menu li a:hover {
-    background-color: #6e0e0e; /* Fondo al pasar el mouse */
+    background-color: rgb(173, 173, 16); /* Fondo al pasar el mouse */
     border-radius: 20px;
 }
 
 li.msjhome {
-background-color: transparent;
-color: rgb(184, 56, 184);
+    background-color: greenyellow;
+    color: green;
+    border-radius: 20px;
+    justify-content: center;
+    text-align: end;
 }
 
-/* Container to grow and push footer down */
+/* Contenedor para que el contenido crezca y empuje el footer hacia abajo */
 .container {
     flex-grow: 1; /* Hace que el contenido crezca y empuje el footer hacia abajo */
 }
-.card {
-    height: 100%; /* Hace que todas las tarjetas tengan la misma altura */
+
+/* Ajuste para el contenedor de las tarjetas */
+.contiene-card .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
+.col-md-4 {
+    flex: 1 1 calc(33.333% - 20px); /* Ajusta el ancho de las tarjetas */
+    display: flex;
+}
+
+/* Estilo para las tarjetas de productos */
+.card {
+    background-color: black;
+    border: 2px solid gray; /* Borde color ladrillo */
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%; /* Asegura que las tarjetas ocupen todo el ancho disponible */
+    height: 100%; /* Hace que todas las tarjetas tengan la misma altura */
+    padding: 5px;
+    gap: 3px;
+}
+
+/* Ajuste para mantener proporción en imágenes */
 .card-img-top {
     object-fit: cover;
-    height: 200px; /* Ajustá esto según el tamaño que quieras para tus imágenes */
+    height: 200px; /* Ajusta esto según el tamaño que quieras para tus imágenes */
     width: 100%;
-    
 }
-div .card.mb
 
-
+.card-body {
+    padding: 20px;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
 /* Footer Styles */
 footer {
-    background-color: #7c2828; /* Color de fondo del footer */
-    color: #e9e3e3;
+    margin: auto;
+    background-color: black; /* Color de fondo del footer */
+    color: #161616;
     text-align: center;
-    padding: 15px 0;
+    padding: 15px;
     width: 100%;
 }
 
@@ -114,5 +162,37 @@ footer {
     nav {
         padding: 20px 0; /* Aumenta padding en móviles */
     }
+    
+    header {
+        flex-direction: column;
+    }
+
+    .card-img-top {
+        height: auto;
+    }
+
+    .col-md-4 {
+        flex: 1 1 100%; /* Tarjetas ocupan todo el ancho en pantallas pequeñas */
+    }
 }
-/*falta agregar stylos a menu.html
+/* Footer Styles */
+footer {
+    background-color: #000; /* Color de fondo del footer */
+    color: #b8b5b5;
+    text-align: center;
+    padding: 15px 0;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+}
+
+/* Asegurar que el footer esté al final de la página */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Hace que el body ocupe al menos toda la pantalla */
+}
+
+main {
+    flex-grow: 1; /* Hace que el contenido crezca y empuje el footer hacia abajo */
+}

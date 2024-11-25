@@ -1,20 +1,11 @@
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
-from . import views
-
+from .views import menu, listar_productos, detalle_producto, crear_producto, editar_producto, eliminar_producto_admin
 
 urlpatterns = [
-    path('', views.menu, name='menu'),  # Página principal
-
-    # Productos
-    path('productos/', views.listar_productos, name='listar_productos'),
-    path('productos/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
-    path('productos/nuevo/', views.crear_producto, name='crear_producto'),
-    path('productos/editar/<int:producto_id>/', views.editar_producto, name='editar_producto'),
-    path('productos/eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('', menu, name='menu'),
+    path('productos/', listar_productos, name='listar_productos'),
+    path('productos/<int:producto_id>/', detalle_producto, name='detalle_producto'),
+    path('productos/nuevo/', crear_producto, name='crear_producto'),
+    path('productos/editar/<int:producto_id>/', editar_producto, name='editar_producto'),
+    path('productos/eliminar/<int:producto_id>/', eliminar_producto_admin, name='eliminar_producto_admin'),
 ]
-
-# Configuraciones para servir archivos estáticos en modo desarrollo
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

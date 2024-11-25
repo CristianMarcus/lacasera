@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito de Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Carrito de Compras</h1>
+    {% if carrito %}
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto_id, item in carrito.items %}
+            <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.precio }}</td>
+                <td>${{ item.total_precio }}</td>
+                <td>
+                    <form method="POST" action="{% url 'eliminar_producto_sesion' producto_id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="totales">
+        <h4>Total de artículos: {{ carrito|length }}</h4>
+        <h4>Total a pagar: ${{ total_carrito }}</h4>
+    </div>
+    <div class="botones-de-pago d-flex justify-content-between">
+        <!-- Botón de Stripe -->
+        <form action="{% url 'procesar_pago_stripe' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Pagar con Stripe</button>
+        </form>
+        <!-- Botón de Mercado Pago -->
+        <form action="{% url 'procesar_pago_mp' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
+        </form>
+    </div>
+    {% else %}
+    <p>El carrito está vacío. <a href="{% url 'menu' %}">Continuar Comprando</a></p>
+    {% endif %}
+    <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
+</div>
+{% endblock %}

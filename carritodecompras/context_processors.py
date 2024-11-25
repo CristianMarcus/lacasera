@@ -1,17 +1,23 @@
 # carritodecompras/context_processors.py
 
-from django.contrib.auth.models import AnonymousUser
-from .models import Carrito  # Asegúrate de que este es el modelo correcto
-from .models import CarritoItem  # Asegúrate de que este modelo esté definido
+from .models import Carrito, LineaCarrito
 
 def carrito_context(request):
-    carrito_items = []  # Inicializamos carrito_items como una lista vacía
     if request.user.is_authenticated:
-        try:
-            carrito = Carrito.objects.get(usuario=request.user)
-            carrito_items = carrito.carritoitem_set.all()  # Obtener los items del carrito
-        except Carrito.DoesNotExist:
-            carrito_items = []  # Si no existe el carrito, aseguramos que esté vacío
+        carrito = Carrito.objects.filter(usuario=request.user).first()
+        if carrito:
+            lineas = LineaCarrito.objects.filter(carrito=carrito).select_related('producto')
+            total_items = sum(linea.cantidad for linea in lineas if linea.producto)
+            total_precio = sum(linea.get_subtotal() for linea in lineas if linea.producto)
+        else:
+            total_items = 0
+            total_precio = 0
+    else:
+        carrito = request.session.get('carrito', {})
+        total_items = sum(item['cantidad'] for item in carrito.values())
+        total_precio = sum(item['total_precio'] for item in carrito.values())
+
     return {
-        'carrito_items': carrito_items,
+        'total_items': total_items,
+        'total_precio': total_precio
     }

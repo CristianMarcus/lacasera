@@ -1,5 +1,3 @@
-# usuarios/views.py
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
@@ -15,6 +13,9 @@ def registro(request):
         form = CustomUserCreationForm(request.POST)  # Usa el formulario personalizado
         if form.is_valid():
             user = form.save()  # Guarda el usuario en la base de datos
+            user.is_staff = False  # Asegúrate de que no sea staff
+            user.is_superuser = False  # Asegúrate de que no sea superusuario
+            user.save()  # Guarda el usuario con los cambios de permisos
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')  # Asegúrate de que este campo esté en tu formulario
             user = authenticate(username=username, password=password)  # Autentica al usuario
