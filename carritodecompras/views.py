@@ -19,6 +19,7 @@ def ver_carrito(request):
         'total_precio': total_precio
     })
 
+
 @login_required
 def agregar_al_carrito(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
@@ -61,6 +62,7 @@ def ver_carrito_sesion(request):
         'carrito': carrito,
         'total_carrito': total_carrito
     })
+
 
 
 

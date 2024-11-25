@@ -10,6 +10,12 @@ def menu(request):
     productos = Producto.objects.all()
     return render(request, 'productos/menu.html', {'productos': productos})
 
+from django.contrib.auth.decorators import user_passes_test
+
+def is_superuser(user):
+    return user.is_superuser
+
+@user_passes_test(is_superuser, login_url='menu')
 def listar_productos(request):
     query = request.GET.get('q')
     categoria_id = request.GET.get('categoria')
@@ -21,6 +27,7 @@ def listar_productos(request):
         productos = productos.filter(categoria__id=categoria_id)
 
     return render(request, 'productos/listar_productos.html', {'productos': productos})
+
 
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
