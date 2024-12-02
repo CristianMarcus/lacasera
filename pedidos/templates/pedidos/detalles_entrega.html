@@ -1,0 +1,13 @@
+<!-- C:\Users\PC-Tati\Desktop\lacasera\tiendadigital\pedidos\templates\pedidos\detalles_entrega.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Detalles de Entrega para el Pedido #{{ pedido.id }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Continuar con el Pago</button>
+    </form>
+</div>
+{% endblock %}

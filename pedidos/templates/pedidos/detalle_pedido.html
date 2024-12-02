@@ -1,0 +1,35 @@
+<!-- C:\Users\PC-Tati\Desktop\lacasera\tiendadigital\pedidos\templates\pedidos\detalle_pedido.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Detalles del Pedido #{{ pedido.id }}</h2>
+    <h5>Cliente: {{ pedido.usuario.username }}</h5>
+    <h5>Dirección de Entrega: {{ pedido.direccion_entrega }}</h5>
+    <h5>Dirección del Usuario: {{ direccion_usuario }}</h5>
+    <table class="table table-hover mt-3">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Imagen</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total por Producto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for linea in detalles %}
+            <tr>
+                <td>{{ linea.producto.nombre }}</td>
+                <td><img src="{{ linea.producto.imagen.url }}" alt="{{ linea.producto.nombre }}" width="100"></td>
+                <td>{{ linea.cantidad }}</td>
+                <td>${{ linea.precio_unitario }}</td>
+                <td>${{ linea.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h4>Total del Pedido: ${{ total_pedido }}</h4>
+    <a href="{% url 'ver_pedidos' %}" class="btn btn-secondary mt-3">Volver a Mis Pedidos</a>
+</div>
+{% endblock %}

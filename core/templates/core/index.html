@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}  <!-- Mantiene el contenido del bloque base -->
+{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Bienvenido a La Casera</h1>
+    <p>¡La mejor pizza a domicilio en tu área!</p>
+</header>
+<section>
+    <h2>Ofertas Especiales</h2>
+    <!-- Aquí puedes mostrar ofertas o promociones destacadas -->
+</section>
+{% endblock %}
