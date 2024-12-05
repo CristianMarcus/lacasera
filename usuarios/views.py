@@ -28,3 +28,18 @@ def registro(request):
     else:
         form = CustomUserCreationForm()  # Usa el formulario personalizado
     return render(request, 'usuarios/registro.html', {'form': form})  # Renderiza la plantilla de registro
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import PerfilForm
+
+@login_required
+def actualizar_perfil(request):
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_pedidos')
+    else:
+        form = PerfilForm(instance=request.user)
+    return render(request, 'usuarios/actualizar_perfil.html', {'form': form})

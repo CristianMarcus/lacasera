@@ -5,6 +5,7 @@ from productos.models import Producto
 from usuarios.models import Usuario
 from django.utils import timezone
 
+
 class Carrito(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.SET_NULL, null=True)
     fecha_creacion = models.DateTimeField(default=timezone.now)

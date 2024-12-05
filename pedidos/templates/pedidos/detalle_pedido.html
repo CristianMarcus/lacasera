@@ -1,35 +1,50 @@
-<!-- C:\Users\PC-Tati\Desktop\lacasera\tiendadigital\pedidos\templates\pedidos\detalle_pedido.html -->
-
 {% extends 'base.html' %}
+
+{% block title %}Detalle del Pedido {% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Detalles del Pedido #{{ pedido.id }}</h2>
-    <h5>Cliente: {{ pedido.usuario.username }}</h5>
-    <h5>Dirección de Entrega: {{ pedido.direccion_entrega }}</h5>
-    <h5>Dirección del Usuario: {{ direccion_usuario }}</h5>
-    <table class="table table-hover mt-3">
+<div class="container my-4">
+    <h1 class="text-center">Detalle del Pedido #{{ pedido.id }}</h1>
+    <p><strong>Usuario:</strong> {{ pedido.usuario.username }}</p>
+    <p><strong>Teléfono:</strong> {{ pedido.usuario.phone_number }}</p>
+    <p><strong>Dirección:</strong> {{ pedido.usuario.address }}</p>
+
+    <span class="badge {% if pedido.estado == 'Pendiente' %}bg-warning text-dark{% elif pedido.estado == 'Entregado' %}bg-success{% elif pedido.estado == 'Cancelado' %}bg-danger{% else %}bg-info{% endif %}">
+        {{ pedido.estado }}
+    </span>
+
+    <h2 class="mt-4">Productos</h2>
+    <table class="table table-bordered mt-3">
         <thead>
             <tr>
                 <th>Producto</th>
-                <th>Imagen</th>
                 <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Total por Producto</th>
+                <th>Precio</th>
+                <th>Imagen</th>
             </tr>
         </thead>
         <tbody>
-            {% for linea in detalles %}
-            <tr>
-                <td>{{ linea.producto.nombre }}</td>
-                <td><img src="{{ linea.producto.imagen.url }}" alt="{{ linea.producto.nombre }}" width="100"></td>
-                <td>{{ linea.cantidad }}</td>
-                <td>${{ linea.precio_unitario }}</td>
-                <td>${{ linea.subtotal }}</td>
-            </tr>
+            {% for linea in pedido.lineas_pedido_pedidos.all %}
+                <tr>
+                    <td>{{ linea.producto.nombre }}</td>
+                    <td>{{ linea.cantidad }}</td>
+                    <td>${{ linea.producto.precio }}</td>
+                    <td>
+                        {% if linea.producto.imagen %}
+                            <img src="{{ linea.producto.imagen.url }}" alt="{{ linea.producto.nombre }}" style="width: 100px; height: auto;">
+                        {% else %}
+                            <span>No disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
-    <h4>Total del Pedido: ${{ total_pedido }}</h4>
-    <a href="{% url 'ver_pedidos' %}" class="btn btn-secondary mt-3">Volver a Mis Pedidos</a>
+
+    <h3 class="text-right mt-4">Total: ${{ total }}</h3>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'listar_pedidos' %}" class="btn btn-secondary">Volver a mis pedidos</a>
+    </div>
 </div>
 {% endblock %}

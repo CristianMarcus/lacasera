@@ -49,8 +49,8 @@ ROOT_URLCONF = 'tiendadigital.urls'
 WSGI_APPLICATION = 'tiendadigital.wsgi.application'
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'auth.User'  # Reemplazá esto si tenés un modelo de usuario personalizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
+
 
 
 

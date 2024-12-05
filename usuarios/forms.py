@@ -49,3 +49,10 @@ class CustomUserChangeForm(UserChangeForm):
             'username': None,
             'email': None,
         }
+        
+
+class PerfilForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['phone_number', 'address']
+        

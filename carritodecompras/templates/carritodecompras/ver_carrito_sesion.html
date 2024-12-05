@@ -3,10 +3,9 @@
 {% block title %}Carrito de Compras{% endblock %}
 
 {% block content %}
-{% load custom_filters %}
 <div class="container mt-5">
     <h1>Carrito de Compras</h1>
-    {% if total_items > 0 %}
+    {% if carrito %}
     <table class="table table-hover">
         <thead class="thead-light">
             <tr>
@@ -18,58 +17,44 @@
             </tr>
         </thead>
         <tbody>
-            {% for linea in lineas %}
+            {% for producto_id, item in carrito.items %}
             <tr>
+                <td>{{ item.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.precio }}</td>
+                <td>${{ item.total_precio }}</td>
                 <td>
-                    {% if linea.producto %}
-                        {{ linea.producto.nombre }}
-                    {% else %}
-                        Producto eliminado
-                    {% endif %}
-                </td>
-                <td>{{ linea.cantidad }}</td>
-                <td>
-                    {% if linea.producto %}
-                        ${{ linea.producto.precio }}
-                    {% else %}
-                        $0
-                    {% endif %}
-                </td>
-                <td>
-                    {% if linea.producto %}
-                        ${{ linea.producto.precio|multiply:linea.cantidad }}
-                    {% else %}
-                        $0
-                    {% endif %}
-                </td>
-                <td>
-                    {% if linea.producto %}
-                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
+                    <form method="POST" action="{% url 'eliminar_producto_sesion' producto_id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     <div class="totales">
-        <h4>Total de artículos: {{ total_items }}</h4>
-        <h4>Total a pagar: ${{ total_precio }}</h4>
+        <h4>Total de artículos: {{ carrito|length }}</h4>
+        <h4>Total a pagar: ${{ total_carrito }}</h4>
     </div>
-    <div class="botones-de-pago d-flex justify-content-between">
+    <div class="botones-de-pago d-flex justify-content-between flex-wrap">
         <!-- Botón de Stripe -->
-        <form action="{% url 'procesar_pago_stripe' %}" method="POST">
+        <form action="{% url 'procesar_pago_stripe' %}" method="POST" class="mb-2">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Pagar con Stripe</button>
         </form>
         <!-- Botón de Mercado Pago -->
-        <form action="{% url 'procesar_pago_mp' %}" method="POST">
+        <form action="{% url 'procesar_pago_mp' %}" method="POST" class="mb-2">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
         </form>
+        <!-- Botón de Pago en Efectivo -->
+        <form action="{% url 'confirmar_pago_efectivo' %}" method="POST" class="mb-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirmar Pago en Efectivo</button>
+        </form>
     </div>
+    
     {% else %}
     <p>El carrito está vacío. <a href="{% url 'menu' %}">Continuar Comprando</a></p>
     {% endif %}

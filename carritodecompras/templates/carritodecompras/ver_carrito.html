@@ -58,16 +58,21 @@
         <h4>Total de artículos: {{ total_items }}</h4>
         <h4>Total a pagar: ${{ total_precio }}</h4>
     </div>
-    <div class="botones-de-pago d-flex justify-content-between">
+    <div class="botones-de-pago d-flex justify-content-between flex-wrap">
         <!-- Botón de Stripe -->
-        <form action="{% url 'procesar_pago_stripe' %}" method="POST">
+        <form action="{% url 'procesar_pago_stripe' %}" method="POST" class="mb-2">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Pagar con Stripe</button>
         </form>
         <!-- Botón de Mercado Pago -->
-        <form action="{% url 'procesar_pago_mp' %}" method="POST">
+        <form action="{% url 'procesar_pago_mp' %}" method="POST" class="mb-2">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
+        </form>
+        <!-- Botón de Pago en Efectivo -->
+        <form action="{% url 'confirmar_pago_efectivo' %}" method="POST" class="mb-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Confirmar Pago en Efectivo</button>
         </form>
     </div>
     {% else %}
