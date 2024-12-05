@@ -68,14 +68,21 @@ def confirmar_pago_efectivo(request):
 
     # Crear el pedido
     pedido = Pedido.objects.create(usuario=request.user, estado="Pendiente")
+    
     for linea in carrito.lineacarrito_set.all():
-        LineaPedido.objects.create(
-            pedido=pedido,
-            producto=linea.producto,
-            cantidad=linea.cantidad
-        )
+        # Verifica que cada línea tenga un producto asociado
+        if linea.producto is not None:
+            LineaPedido.objects.create(
+                pedido=pedido,
+                producto=linea.producto,
+                cantidad=linea.cantidad
+            )
+        else:
+            messages.error(request, "Algunas líneas en tu carrito no tienen un producto válido.")
+            return redirect('ver_carrito')
 
     # Vaciar el carrito
     carrito.delete()
     messages.success(request, "Pedido confirmado. Paga al recibir tu pedido.")
     return redirect('menu')
+
