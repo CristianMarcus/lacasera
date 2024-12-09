@@ -1,4 +1,17 @@
 /* baseglobal.css */
+/* Header Styles */
+header {
+    margin: 5px; /* Eliminado margen superior */
+    padding:  20px;
+    text-align: center;
+    background-color: rgb(22, 22, 121);
+    border-radius: 10px;
+    color: black;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+
+}
+
 
 /* General Body Styles */
 body {
@@ -9,7 +22,7 @@ body {
     background-color: white; 
     margin: 1;
     font-family: Arial, sans-serif;
-    color: #302f2f; /* Texto blanco para contraste */
+    color: blue;
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* Hace que el body ocupe al menos toda la pantalla */
@@ -24,14 +37,6 @@ body {
     border-radius: 5px;
 }
 
-/* Header Styles */
-header {
-    margin: 5px; /* Eliminado margen superior */
-    padding: 10px 20px;
-    text-align: center;
-    background-color: rgb(22, 22, 121);
-    border-radius: 10px;
-}
 
 /* Navigation Styles */
 nav {
@@ -45,6 +50,7 @@ nav button {
     margin: 5px;
     background-color: rgb(238, 236, 206);
 }
+
 /* Menu List Styles */
 ul.menu {
     list-style-type: none; /* Quita los puntos de las listas */
@@ -59,11 +65,22 @@ ul.menu {
 
 /* Menu Items Styles */
 ul.menu li {
-    margin-right: 20px; /* Espaciado entre ítems */
+    margin-right: 30px; /* Espaciado entre ítems */
 }
 
 ul.menu li:last-child {
     margin-right: 0; /* Quita margen del último ítem */
+}
+
+a {
+    text-decoration: none;
+    color: rgb(167, 15, 15);
+    font-weight: bold;
+}
+li{
+    text-decoration: none;
+    color: black;
+    font-weight: bolder;
 }
 
 /* Link Styles */
@@ -82,11 +99,11 @@ ul.menu li a:hover {
     border-radius: 20px;
 }
 
-li.msjhome {
+.msjhome {
     background-color: greenyellow;
     color: green;
     border-radius: 20px;
-    justify-content: center;
+    justify-content: right ;
     text-align: end;
 }
 
@@ -138,14 +155,27 @@ li.msjhome {
 }
 
 /* Footer Styles */
-footer {
-    margin: auto;
-    background-color: black; /* Color de fondo del footer */
-    color: #161616;
+.footerpro {
+    background-color: rgb(22, 22, 121);
+    color: rgb(10, 4, 66);
+    font-size: medium;
+    font-weight: bold;
     text-align: center;
-    padding: 15px;
+    padding: 20px 0;
     width: 100%;
+    position: relative;
+    bottom: 0;
+    margin-top: 50px;
 }
+
+
+
+main {
+    flex-grow: 3; /* Hace que el contenido crezca y empuje el footer hacia abajo */
+}
+
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -174,25 +204,4 @@ footer {
     .col-md-4 {
         flex: 1 1 100%; /* Tarjetas ocupan todo el ancho en pantallas pequeñas */
     }
-}
-/* Footer Styles */
-footer {
-    background-color: #000; /* Color de fondo del footer */
-    color: #b8b5b5;
-    text-align: center;
-    padding: 15px 0;
-    width: 100%;
-    position: relative;
-    bottom: 0;
-}
-
-/* Asegurar que el footer esté al final de la página */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Hace que el body ocupe al menos toda la pantalla */
-}
-
-main {
-    flex-grow: 1; /* Hace que el contenido crezca y empuje el footer hacia abajo */
 }

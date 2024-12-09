@@ -1,13 +1,7 @@
 # pagos/admin.py
-
 from django.contrib import admin
-from .models import Pedido, LineaPedido
+from pedidos.models import Pedido  # Importar el modelo Pedido
+from pedidos.admin import PedidoAdmin  # Importar la clase PedidoAdmin si la tienes personalizada
 
-class PedidoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'usuario', 'fecha_pedido', 'estado', 'total')
-    list_filter = ('estado', 'fecha_pedido')
-    readonly_fields = ('fecha_pedido',)
-    ordering = ('fecha_pedido',)
+# Registrar el modelo Pedido con la clase de administración personalizada
 
-admin.site.register(Pedido, PedidoAdmin)
-admin.site.register(LineaPedido)

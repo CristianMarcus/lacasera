@@ -3,8 +3,15 @@
 from .models import Carrito
 
 def obtener_carrito_usuario(request):
-    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
-    return carrito
+    """
+    Devuelve el carrito del usuario autenticado. Si no existe, lo crea.
+    """
+    if request.user.is_authenticated:
+        carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+        return carrito
+    else:
+        return None
+
 
 def actualizar_sesion_carrito(request, producto, cantidad):
     carrito = request.session.get('carrito', {})
