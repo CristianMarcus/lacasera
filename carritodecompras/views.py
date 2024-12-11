@@ -5,6 +5,8 @@ from productos.models import Producto
 from .models import LineaCarrito, Carrito
 from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
 
+from django.contrib.messages import get_messages
+
 @login_required
 def ver_carrito(request):
     carrito = obtener_carrito_usuario(request)
@@ -12,12 +14,16 @@ def ver_carrito(request):
     
     total_items = sum(linea.cantidad for linea in lineas if linea.producto)
     total_precio = sum(linea.get_subtotal() for linea in lineas if linea.producto)
+    
+    mensajes = get_messages(request)
 
     return render(request, 'carritodecompras/ver_carrito.html', {
         'lineas': lineas,
         'total_items': total_items,
-        'total_precio': total_precio
+        'total_precio': total_precio,
+        'mensajes': mensajes
     })
+
 
 
 @login_required

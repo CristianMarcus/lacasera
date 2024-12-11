@@ -2,6 +2,24 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import Usuario
 
+
+
+
+
+from django import forms
+from django.contrib.auth.models import User
+
+class UsuarioUpdateForm(forms.ModelForm):
+    direccion = forms.CharField(max_length=255, required=True, label='Dirección')
+    telefono = forms.CharField(max_length=15, required=True, label='Teléfono')
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'direccion', 'telefono']
+
+
+
+
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(label='Usuario')  # Cambia 'username' a 'Usuario'
     password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)  # Cambia 'password' a 'Contraseña'
@@ -51,7 +69,7 @@ class CustomUserChangeForm(UserChangeForm):
         }
         
 
-class PerfilForm(forms.ModelForm):
+class contactForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['phone_number', 'address']

@@ -10,6 +10,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Redirecciones de autenticación
+
 LOGIN_REDIRECT_URL = 'listar_productos'  # Redirige después del login
 LOGOUT_REDIRECT_URL = 'login'  # Redirige después del logout
 LOGIN_URL = '/usuarios/login/'  # URL de inicio de sesión

@@ -5,8 +5,18 @@
 {% block content %}
 {% load custom_filters %}
 <div class="container mt-5">
+    <!-- Mostrar mensajes de Django -->
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <h1>Carrito de Compras</h1>
     {% if total_items > 0 %}
+    <!-- Tabla de productos -->
     <table class="table table-hover">
         <thead class="thead-light">
             <tr>
@@ -22,29 +32,30 @@
             <tr>
                 <td>
                     {% if linea.producto %}
-                        {{ linea.producto.nombre }}
+                    {{ linea.producto.nombre }}
                     {% else %}
-                        Producto eliminado
+                    Producto eliminado
                     {% endif %}
                 </td>
                 <td>{{ linea.cantidad }}</td>
                 <td>
                     {% if linea.producto %}
-                        ${{ linea.producto.precio }}
+                    ${{ linea.producto.precio }}
                     {% else %}
-                        $0
+                    $0
                     {% endif %}
                 </td>
                 <td>
                     {% if linea.producto %}
-                        ${{ linea.producto.precio|multiply:linea.cantidad }}
+                    ${{ linea.producto.precio|multiply:linea.cantidad }}
                     {% else %}
-                        $0
+                    $0
                     {% endif %}
                 </td>
                 <td>
                     {% if linea.producto %}
-                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
+                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}"
+                        style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
@@ -54,30 +65,84 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Totales -->
     <div class="totales">
         <h4>Total de artículos: {{ total_items }}</h4>
         <h4>Total a pagar: ${{ total_precio }}</h4>
     </div>
+
+    <!-- Botones de pago -->
     <div class="botones-de-pago d-flex justify-content-between flex-wrap">
-        <!-- Botón de Stripe -->
-        <form action="{% url 'procesar_pago_stripe' %}" method="POST" class="mb-2">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Pagar con Stripe</button>
-        </form>
-        <!-- Botón de Mercado Pago -->
-        <form action="{% url 'procesar_pago_mp' %}" method="POST" class="mb-2">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Pagar con Mercado Pago</button>
-        </form>
-        <!-- Botón de Pago en Efectivo -->
-        <form action="{% url 'confirmar_pago_efectivo' %}" method="POST" class="mb-2">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">Confirmar Pago en Efectivo</button>
-        </form>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">Pagar con Stripe</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">Pagar con Mercado
+            Pago</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#contactModal">Confirmar Pago en
+            Efectivo</button>
     </div>
+    <div id="contactModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel">Confirma tu Contacto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactForm" method="post" action="{% url 'actualizar_contacto' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Guardar y proceder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     {% else %}
     <p>El carrito está vacío. <a href="{% url 'menu' %}">Continuar Comprando</a></p>
     {% endif %}
     <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
 </div>
+
+<script>
+    // Enviar formulario por AJAX
+    // Enviar formulario por AJAX
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+            .then(response => {
+                // Verifica si la respuesta es exitosa
+                if (!response.ok) {
+                    throw new Error('La respuesta del servidor no fue exitosa');
+                }
+                return response.json();  // Convierte la respuesta a JSON
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);  // Muestra el mensaje de éxito
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
+                    modal.hide();  // Cierra el modal
+                    window.location.href = "/carritodecompras/";  // Redirige al carrito
+                } else {
+                    console.log('Errores:', data.errors);  // Muestra los errores
+                    alert('Hubo un problema. Revisa los datos ingresados.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al procesar la solicitud:', error);
+                alert('Hubo un problema al procesar tu solicitud.');
+            });
+    });
+</script>
 {% endblock %}
