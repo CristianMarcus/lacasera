@@ -1,10 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from carritodecompras.models import Carrito # Modelos del carrito
+from carritodecompras.models import Carrito  # Modelos del carrito
 from pedidos.models import Pedido, LineaPedido  # Modelos de pedidos
 from productos.models import Producto  # Asegúrate de importar Producto
-
 
 # Verificación de usuario administrador
 def es_admin(user):
@@ -21,8 +20,12 @@ def cambiar_estado_pedido(request, pedido_id, nuevo_estado):
 
 @login_required
 def listar_pedidos(request):
-    # Filtrar pedidos por el usuario actual 
-    pedidos = Pedido.objects.filter(cliente=request.user)
+    if request.user.is_superuser:
+        # Si el usuario es administrador, mostrar todos los pedidos
+        pedidos = Pedido.objects.all()
+    else:
+        # Si el usuario no es administrador, filtrar pedidos por el usuario actual
+        pedidos = Pedido.objects.filter(cliente=request.user)
     return render(request, 'pedidos/listar_pedidos.html', {'pedidos': pedidos})
 
 @login_required
@@ -34,7 +37,7 @@ def realizar_pedido(request):
         return redirect('ver_carrito')
     
     # Crear el pedido
-    pedido = Pedido.objects.create(usuario=request.user)
+    pedido = Pedido.objects.create(cliente=request.user)
     for linea in carrito.lineacarrito_set.all():
         LineaPedido.objects.create(
             pedido=pedido,
@@ -49,7 +52,7 @@ def realizar_pedido(request):
 def eliminar_pedido(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
-    if es_admin(request.user) or pedido.usuario == request.user:
+    if request.user.is_superuser or pedido.cliente == request.user:
         pedido.delete()
         messages.success(request, "El pedido ha sido eliminado correctamente.")
     else:
@@ -80,7 +83,7 @@ def confirmar_pago_efectivo(request):
         return redirect('carrito')
 
     # Crear el pedido
-    pedido = Pedido.objects.create(usuario=request.user, estado="Pendiente")
+    pedido = Pedido.objects.create(cliente=request.user, estado="Pendiente")
     
     for linea in carrito.lineacarrito_set.all():
         # Verifica que cada línea tenga un producto asociado
