@@ -47,16 +47,24 @@ def crear_producto(request):
 
 @login_required
 def editar_producto(request, producto_id):
-    producto = get_object_or_404(Producto, pk=producto_id)
+    producto = get_object_or_404(Producto, id=producto_id)
+    
     if request.method == 'POST':
-        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        form = ProductoForm(request.POST, instance=producto)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto actualizado exitosamente.')
-            return redirect('listar_productos')
+            nombre = form.cleaned_data['nombre']
+            producto_existente = Producto.objects.filter(nombre=nombre).exclude(id=producto_id).first()
+            if producto_existente:
+                messages.error(request, "Ya existe un producto con este nombre. Usa un nombre diferente.")
+            else:
+                form.save()
+                messages.success(request, "Producto actualizado con éxito.")
+                return redirect('listar_productos')  # Redirigir a la lista de productos
     else:
         form = ProductoForm(instance=producto)
-    return render(request, 'productos/editar_producto.html', {'form': form})
+    
+    return render(request, 'productos/editar_producto.html', {'form': form, 'producto': producto})
+
 
 @login_required
 def eliminar_producto_admin(request, producto_id):

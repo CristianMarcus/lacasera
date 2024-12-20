@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ form.instance.id|default:"Crear" }} Producto{% endblock %}
+{% block title %}Editar Producto{% endblock %}
 
 {% block content %}
-    <h1>{{ form.instance.id|default:"Crear" }} Producto</h1>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Editar Producto</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{% url 'listar_productos' %}" class="btn btn-secondary">Cancelar</a>
     </form>
-    <a href="{% url 'listar_productos' %}" class="btn btn-primary">Volver a la lista</a>
+</div>
 {% endblock %}
