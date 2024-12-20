@@ -1,50 +1,61 @@
 {% extends 'base.html' %}
 
-{% block title %}Detalle del Pedido {% endblock %}
+{% block title %}Detalle del Pedido{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <h1 class="text-center">Detalle del Pedido #{{ pedido.id }}</h1>
-    <p><strong>Usuario:</strong> {{ pedido.usuario.username }}</p>
-    <p><strong>Teléfono:</strong> {{ pedido.usuario.phone_number }}</p>
-    <p><strong>Dirección:</strong> {{ pedido.usuario.address }}</p>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Detalle del Pedido #{{ pedido.id }}</h1>
 
-    <span class="badge {% if pedido.estado == 'Pendiente' %}bg-warning text-dark{% elif pedido.estado == 'Entregado' %}bg-success{% elif pedido.estado == 'Cancelado' %}bg-danger{% else %}bg-info{% endif %}">
-        {{ pedido.estado }}
-    </span>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <p><strong>Usuario:</strong> {{ pedido.cliente.username }}</p>
+            <p><strong>Dirección:</strong> {{ pedido.cliente.address }}</p>
+            <p><strong>Número de Teléfono:</strong> {{ pedido.cliente.phone_number }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Fecha del Pedido:</strong> {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</p>
+            <p><strong>Estado:</strong> <span class="badge {% if pedido.estado == 'Pendiente' %}bg-warning{% elif pedido.estado == 'En Proceso' %}bg-primary{% elif pedido.estado == 'Enviado' %}bg-info{% elif pedido.estado == 'Entregado' %}bg-success{% else %}bg-danger{% endif %}">{{ pedido.estado }}</span></p>
+            <p><strong>Total:</strong> ${{ total }}</p>
+        </div>
+    </div>
 
-    <h2 class="mt-4">Productos</h2>
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio</th>
-                <th>Imagen</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for linea in pedido.lineas_pedido_pedidos.all %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ linea.producto.nombre }}</td>
-                    <td>{{ linea.cantidad }}</td>
-                    <td>${{ linea.producto.precio }}</td>
-                    <td>
-                        {% if linea.producto.imagen %}
-                            <img src="{{ linea.producto.imagen.url }}" alt="{{ linea.producto.nombre }}" style="width: 100px; height: auto;">
-                        {% else %}
-                            <span>No disponible</span>
-                        {% endif %}
-                    </td>
+                    <th scope="col">Imagen</th>  <!-- Nueva columna para la imagen -->
+                    <th scope="col">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio Unitario</th>
+                    <th scope="col">Subtotal</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h3 class="text-right mt-4">Total: ${{ total }}</h3>
+            </thead>
+            <tbody>
+                {% for linea in lineas %}
+                <tr>
+                    <td>
+                        <img src="{{ linea.producto.imagen.url }}" alt="{{ linea.producto.nombre }}" width="50" height="50">  <!-- Mostrar imagen del producto -->
+                    </td>
+                    <td>{{ linea.producto }}</td>
+                    <td>{{ linea.cantidad }}</td>
+                    <td>${{ linea.precio_unitario }}</td>
+                    <td>${{ linea.subtotal }}</td> <!-- Usar el subtotal calculado en la vista -->
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Total</th>
+                    <th>${{ total }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
     <div class="text-center mt-4">
-        <a href="{% url 'listar_pedidos' %}" class="btn btn-secondary">Volver a mis pedidos</a>
+        <a href="{% url 'listar_pedidos' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Mis Pedidos
+        </a>
     </div>
 </div>
 {% endblock %}

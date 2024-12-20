@@ -4,40 +4,42 @@ from django.contrib.auth.decorators import login_required
 from productos.models import Producto
 from .models import LineaCarrito, Carrito
 from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
-
 from django.contrib.messages import get_messages
+
 
 @login_required
 def ver_carrito(request):
-    carrito = obtener_carrito_usuario(request)
-    lineas = LineaCarrito.objects.filter(carrito=carrito).select_related('producto')
-    
-    total_items = sum(linea.cantidad for linea in lineas if linea.producto)
-    total_precio = sum(linea.get_subtotal() for linea in lineas if linea.producto)
-    
-    mensajes = get_messages(request)
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+    lineas = carrito.lineas.all()
+    total_items = sum(linea.cantidad for linea in lineas)
+    total_precio = sum(linea.get_subtotal() for linea in lineas)
 
-    return render(request, 'carritodecompras/ver_carrito.html', {
+    return render(request, 'ver_carrito.html', {
+        'carrito': carrito,
         'lineas': lineas,
         'total_items': total_items,
-        'total_precio': total_precio,
-        'mensajes': mensajes
+        'total_precio': total_precio
     })
-
-
 
 @login_required
 def agregar_al_carrito(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
-    carrito = obtener_carrito_usuario(request)
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+
+    cantidad = int(request.POST.get('cantidad', 1))
+
     linea, created = LineaCarrito.objects.get_or_create(carrito=carrito, producto=producto)
-    
-    if not created:
-        linea.cantidad += 1
-    
+    if created:
+        linea.cantidad = cantidad
+    else:
+        linea.cantidad += cantidad
+
     linea.save()
-    messages.success(request, f'{producto.nombre} fue agregado al carrito.')
     return redirect('carrito')
+
+
+
+
 
 @login_required
 def eliminar_producto(request, producto_id):

@@ -10,7 +10,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Redirecciones de autenticación
-
 LOGIN_REDIRECT_URL = 'listar_productos'  # Redirige después del login
 LOGOUT_REDIRECT_URL = 'login'  # Redirige después del logout
 LOGIN_URL = '/usuarios/login/'  # URL de inicio de sesión
@@ -51,10 +50,6 @@ WSGI_APPLICATION = 'tiendadigital.wsgi.application'
 
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = 'usuarios.Usuario'
-
-
-
-
 
 # Configuración de plantillas
 TEMPLATES = [
@@ -100,19 +95,14 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# settings.py
+# Configuración de medios
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Configuración de archivos estáticos
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_URL = '/static/' 
-STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static'), ] 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
 
 # Campo de clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -130,15 +120,11 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'danger',
 }
-# settings.py
 
 # Claves de API de Stripe
 STRIPE_SECRET_KEY = 'tu_secret_key'
 STRIPE_PUBLISHABLE_KEY = 'tu_publishable_key'
 
-
-
 # Claves de API de MercadoPago
 MERCADOPAGO_PUBLIC_KEY = 'tu_public_key'
 MERCADOPAGO_ACCESS_TOKEN = 'tu_access_token'
-

@@ -69,7 +69,7 @@ class CustomUserChangeForm(UserChangeForm):
         }
         
 
-class contactForm(forms.ModelForm):
+class PerfilForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['phone_number', 'address']

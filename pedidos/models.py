@@ -1,41 +1,20 @@
 from django.db import models
-from django.core.exceptions import ValidationError
-from carritodecompras.models import Producto
-from usuarios.models import Usuario
+from productos.models import Producto
 
 class Pedido(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='pedidos_pedidos')
+    cliente = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE)
+    estado = models.CharField(max_length=50)  # Aquí debe ser `max_length`
     fecha_pedido = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=50, choices=[
-        ('Pendiente', 'Pendiente'),
-        ('En Proceso', 'En Proceso'),
-        ('Enviado', 'Enviado'),
-        ('Entregado', 'Entregado'),
-        ('Cancelado', 'Cancelado'),
-    ], default='Pendiente')
+    total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Pedido {self.id} de {self.usuario.username}"
-
-    @property
-    def cantidad_total(self):
-        return sum(linea.cantidad for linea in self.lineas_pedido_pedidos.all())
+        return f"Pedido {self.id} - {self.cliente.username}"
 
 class LineaPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='lineas_pedido_pedidos')
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lineas_pedido_pedidos')
+    pedido = models.ForeignKey(Pedido, related_name="lineas", on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)  # Clave foránea a Producto
     cantidad = models.IntegerField()
-    
-
-    def clean(self):
-        if self.cantidad <= 0:
-            raise ValidationError("La cantidad debe ser mayor que cero.")
-        if not self.producto.disponible:
-            raise ValidationError("El producto no está disponible.")
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.nombre}"

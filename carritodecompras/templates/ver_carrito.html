@@ -54,8 +54,7 @@
                 </td>
                 <td>
                     {% if linea.producto %}
-                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}"
-                        style="display:inline;">
+                    <form method="POST" action="{% url 'eliminar_producto' linea.producto.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
@@ -74,24 +73,22 @@
 
     <!-- Botones de pago -->
     <div class="botones-de-pago d-flex justify-content-between flex-wrap">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">Pagar con Stripe</button>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">Pagar con Mercado
-            Pago</button>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#contactModal">Confirmar Pago en
-            Efectivo</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">Actualizar Contacto</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal">Confirmar Pedido</button>
     </div>
-    <div id="contactModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel"
-        aria-hidden="true">
+
+    <!-- Modal de Actualización de Contacto -->
+    <div id="contactModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="contactModalLabel">Confirma tu Contacto</h5>
+                    <h5 class="modal-title" id="contactModalLabel">Actualiza tu Información de Contacto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="contactForm" method="post" action="{% url 'actualizar_contacto' %}">
+                    <form method="post" action="{% url 'actualizar_contacto' %}">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        {{ form.as_p }} <!-- Renderiza todos los campos del formulario -->
                         <button type="submit" class="btn btn-primary">Guardar y proceder</button>
                     </form>
                 </div>
@@ -99,6 +96,24 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación de Pago -->
+    <div id="paymentModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Confirma tu Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas confirmar el pedido y proceder con el pago?</p>
+                    <form method="post" action="{% url 'confirmar_pago' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Confirmar Pedido</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% else %}
     <p>El carrito está vacío. <a href="{% url 'menu' %}">Continuar Comprando</a></p>
@@ -106,43 +121,4 @@
     <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
 </div>
 
-<script>
-    // Enviar formulario por AJAX
-    // Enviar formulario por AJAX
-    document.getElementById('contactForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const form = this;
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-            .then(response => {
-                // Verifica si la respuesta es exitosa
-                if (!response.ok) {
-                    throw new Error('La respuesta del servidor no fue exitosa');
-                }
-                return response.json();  // Convierte la respuesta a JSON
-            })
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);  // Muestra el mensaje de éxito
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('contactModal'));
-                    modal.hide();  // Cierra el modal
-                    window.location.href = "/carritodecompras/";  // Redirige al carrito
-                } else {
-                    console.log('Errores:', data.errors);  // Muestra los errores
-                    alert('Hubo un problema. Revisa los datos ingresados.');
-                }
-            })
-            .catch(error => {
-                console.error('Error al procesar la solicitud:', error);
-                alert('Hubo un problema al procesar tu solicitud.');
-            });
-    });
-</script>
 {% endblock %}

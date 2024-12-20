@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmación de Pedido{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Mostrar mensajes de Django -->
+    {% if messages %}
+    <div class="alert alert-success">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h1>Pedido Confirmado</h1>
+    <p>Tu pedido ha sido confirmado con éxito. ¡Gracias por tu compra!</p>
+    <a href="{% url 'listar_pedidos' %}" class="btn btn-primary mt-3">Ver tus pedidos</a>
+</div>
+{% endblock %}

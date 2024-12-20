@@ -1,31 +1,26 @@
-# carritodecompras/models.py
-
 from django.db import models
+from django.conf import settings
 from productos.models import Producto
-from usuarios.models import Usuario
 from django.utils import timezone
 
-
 class Carrito(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.SET_NULL, null=True)
-    fecha_creacion = models.DateTimeField(default=timezone.now)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)
+    creado = models.DateTimeField(default=timezone.now)
 
     def get_total(self):
-        total = sum(linea.get_subtotal() for linea in self.lineacarrito_set.all())
+        total = sum(linea.get_subtotal() for linea in self.lineas.all())
         return total
 
     def __str__(self):
-        return f'Carrito de {self.usuario}'
+        return f"Carrito {self.id} de {self.usuario.username}"
 
 class LineaCarrito(models.Model):
-    carrito = models.ForeignKey(Carrito, on_delete=models.SET_NULL, null=True)
-    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
-    cantidad = models.PositiveIntegerField(default=1)
+    carrito = models.ForeignKey(Carrito, related_name='lineas', on_delete=models.CASCADE, default=1)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, default=1)
+    cantidad = models.IntegerField(default=1)  # Asegurarse de que el campo cantidad tenga un valor predeterminado
 
     def get_subtotal(self):
-        if self.producto:
-            return self.cantidad * self.producto.precio
-        return 0  # Devuelve 0 si el producto es None
+        return self.cantidad * self.producto.precio
 
     def __str__(self):
-        return f'{self.cantidad} x {self.producto.nombre if self.producto else "Producto eliminado"}'
+        return f"{self.cantidad} x {self.producto.nombre}"

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Acceso Denegado{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Acceso Denegado</h1>
+    <p class="text-center">No tienes permiso para ver esta página.</p>
+    <div class="text-center mt-4">
+        <a href="{% url 'listar_pedidos' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Mis Pedidos
+        </a>
+    </div>
+</div>
+{% endblock %}
