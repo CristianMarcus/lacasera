@@ -7,6 +7,12 @@ from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
 from django.contrib.messages import get_messages
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Carrito
+from pedidos.models import Pedido
+from .forms import PedidoContactoForm
+
 @login_required
 def ver_carrito(request):
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
@@ -14,12 +20,36 @@ def ver_carrito(request):
     total_items = sum(linea.cantidad for linea in lineas)
     total_precio = sum(linea.get_subtotal() for linea in lineas)
 
+    # Obtener el pedido en estado "Pendiente" o crear uno nuevo si no existe
+    pedido = Pedido.objects.filter(cliente=request.user, estado="Pendiente").first()
+    if not pedido:
+        pedido = Pedido.objects.create(cliente=request.user, estado="Pendiente", total=total_precio)
+    else:
+        # Asegúrate de actualizar el total del pedido
+        pedido.total = total_precio
+        pedido.save()
+
+    # Usar los datos del usuario si los campos del pedido están vacíos
+    direccion = pedido.direccion or request.user.address
+    telefono = pedido.telefono or request.user.phone_number
+
+    form = PedidoContactoForm(initial={
+        'direccion': direccion,
+        'telefono': telefono,
+    })
+
     return render(request, 'ver_carrito.html', {
         'carrito': carrito,
         'lineas': lineas,
         'total_items': total_items,
-        'total_precio': total_precio
+        'total_precio': total_precio,
+        'form': form,
+        'pedido': pedido
     })
+
+
+
+
 
 @login_required
 def agregar_al_carrito(request, producto_id):
@@ -116,3 +146,35 @@ def procesar_pago_stripe(request):
 def procesar_pago_mp(request):
     # Lógica para procesar el pago con Mercado Pago
     return render(request, 'carritodecompras/procesar_pago_mp.html')
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import PedidoContactoForm
+from pedidos.models import Pedido
+
+@login_required
+def actualizar_contacto_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    
+    if request.method == 'POST':
+        form = PedidoContactoForm(request.POST)
+        if form.is_valid():
+            print(f"Datos antes de actualizar: Dirección: {pedido.direccion}, Teléfono: {pedido.telefono}")
+            pedido.direccion = form.cleaned_data['direccion']
+            pedido.telefono = form.cleaned_data['telefono']
+            pedido.save()
+            print(f"Datos después de actualizar: Dirección: {pedido.direccion}, Teléfono: {pedido.telefono}")
+            return JsonResponse({'success': True})
+        else:
+            print(f"Errores del formulario: {form.errors}")
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = PedidoContactoForm(initial={
+            'direccion': pedido.direccion,
+            'telefono': pedido.telefono,
+        })
+    
+    return render(request, 'carritodecompras/actualizar_contacto_pedido.html', {'form': form, 'pedido': pedido})

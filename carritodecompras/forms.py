@@ -10,3 +10,9 @@ class LineaCarritoForm(forms.ModelForm):
     class Meta:
         model = LineaCarrito
         fields = ['carrito', 'producto', 'cantidad']
+
+class PedidoContactoForm(forms.Form):
+    direccion = forms.CharField(max_length=255, required=True, label="Dirección")
+    telefono = forms.CharField(max_length=20, required=True, label="Teléfono")
+
+        

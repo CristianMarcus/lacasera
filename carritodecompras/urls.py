@@ -1,13 +1,9 @@
 from django.urls import path
-from .views import ver_carrito, agregar_al_carrito, eliminar_producto, ver_carrito_sesion, agregar_producto_sesion, eliminar_producto_sesion, procesar_pago_stripe, procesar_pago_mp
+from .views import ver_carrito, agregar_al_carrito, eliminar_producto, ver_carrito_sesion, agregar_producto_sesion, eliminar_producto_sesion, procesar_pago_stripe, procesar_pago_mp, actualizar_contacto_pedido
 
 urlpatterns = [
     path('', ver_carrito, name='carrito'),
-
-
-
-   
-
+    path('actualizar_contacto_pedido/<int:pedido_id>/', actualizar_contacto_pedido, name='actualizar_contacto_pedido'),
     path('agregar/<int:producto_id>/', agregar_al_carrito, name='agregar_al_carrito'),
     path('eliminar/<int:producto_id>/', eliminar_producto, name='eliminar_producto'),
     path('sesion/', ver_carrito_sesion, name='ver_carrito_sesion'),
@@ -15,4 +11,6 @@ urlpatterns = [
     path('sesion/eliminar/<int:producto_id>/', eliminar_producto_sesion, name='eliminar_producto_sesion'),
     path('procesar_pago_stripe/', procesar_pago_stripe, name='procesar_pago_stripe'),
     path('procesar_pago_mp/', procesar_pago_mp, name='procesar_pago_mp'),
+    
+    
 ]

@@ -102,19 +102,39 @@ def confirmar_pago_efectivo(request):
     messages.success(request, "Pedido confirmado. Paga al recibir tu pedido.")
     return redirect('menu')
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Pedido, LineaPedido
+from carritodecompras.models import Carrito, LineaCarrito
+from productos.models import Producto
+
 @login_required
 def confirmar_pago(request):
     usuario = request.user
-    carrito = Carrito.objects.get(usuario=usuario)
+    carrito = get_object_or_404(Carrito, usuario=usuario)
     if request.method == 'POST':
-        total = carrito.get_total()  # Asegúrate de calcular el total correctamente
+        total = sum(linea.get_subtotal() for linea in carrito.lineas.all())
 
-        # Crear el pedido
-        pedido = Pedido.objects.create(
-            cliente=usuario,
-            estado="Pendiente",
-            total=total
-        )
+        # Obtener el pedido pendiente existente
+        pedido = Pedido.objects.filter(cliente=usuario, estado="Pendiente").first()
+
+        if pedido is not None:
+            # Actualizar el total del pedido existente
+            pedido.total = total
+            pedido.direccion = request.POST.get('direccion', usuario.address)
+            pedido.telefono = request.POST.get('telefono', usuario.phone_number)
+            pedido.save()
+        else:
+            # Crear un nuevo pedido si no existe ninguno pendiente
+            pedido = Pedido.objects.create(
+                cliente=usuario,
+                estado="Pendiente",
+                total=total,
+                direccion=request.POST.get('direccion', usuario.address),
+                telefono=request.POST.get('telefono', usuario.phone_number)
+            )
+
         # Crear las líneas de pedido
         for linea in carrito.lineas.all():
             producto = get_object_or_404(Producto, nombre=linea.producto.nombre)
@@ -124,6 +144,7 @@ def confirmar_pago(request):
                 cantidad=linea.cantidad,
                 precio_unitario=linea.producto.precio
             )
+        
         # Vaciar el carrito de compras
         carrito.lineas.all().delete()
 
@@ -132,4 +153,5 @@ def confirmar_pago(request):
 
         # Redirigir a una página de confirmación o pedidos
         return redirect('listar_pedidos')  # O redirigir a una página de confirmación
+
     return render(request, 'pedidos/confirmar_pago.html', {'carrito': carrito})

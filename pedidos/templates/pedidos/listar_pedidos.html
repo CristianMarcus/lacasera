@@ -25,8 +25,8 @@
                 <tr>
                     <th scope="row">{{ pedido.id }}</th>
                     <td>{{ pedido.cliente.username }}</td>
-                    <td>{{ pedido.cliente.address }}</td>
-                    <td>{{ pedido.cliente.phone_number }}</td>
+                    <td>{{ pedido.direccion }}</td>
+                    <td>{{ pedido.telefono }}</td>
                     <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
                     <td>
                         <span class="badge {% if pedido.estado == 'Pendiente' %}bg-warning{% elif pedido.estado == 'En Proceso' %}bg-primary{% elif pedido.estado == 'Enviado' %}bg-info{% elif pedido.estado == 'Entregado' %}bg-success{% else %}bg-danger{% endif %}">
