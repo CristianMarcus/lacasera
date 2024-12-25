@@ -3,15 +3,27 @@
 {% block content %}
 <h1>{{ producto.nombre }}</h1>
 <p>{{ producto.descripcion }}</p>
+<p>Precio: ${{ producto.precio }}</p>
 <p>Precio por docena: ${{ producto.precio_docena }}</p>
 <p>Precio por media docena: ${{ producto.precio_media_docena }}</p>
 <p>Precio por unidad: ${{ producto.precio_unidad }}</p>
 
-<form method="post" action="{% url 'agregar_al_carrito' producto.id %}">
+{% if producto.es_empanada %}
+<form method="POST" action="{% url 'carritodecompras:agregar' producto.id %}">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
+    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
 </form>
+{% else %}
+<form method="POST" action="{% url 'carritodecompras:agregar' producto.id %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="cantidad_total">Cantidad:</label>
+        <input type="number" id="cantidad_total" name="cantidad_total" min="1" value="1" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+</form>
+{% endif %}
 
 <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
 {% endblock %}

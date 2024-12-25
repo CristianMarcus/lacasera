@@ -51,7 +51,8 @@ def agregar_al_carrito(request, producto_id):
     if request.method == 'POST':
         form = AgregarCarritoForm(request.POST, producto=producto)
         if form.is_valid():
-            if producto.es_empanada:
+            if hasattr(producto, 'es_empanada') and producto.es_empanada:
+                # Manejo de productos con variedades
                 for field_name, cantidad in form.cleaned_data.items():
                     if field_name.startswith('variedad_') and cantidad > 0:
                         variedad_id = int(field_name.split('_')[1])
@@ -59,14 +60,15 @@ def agregar_al_carrito(request, producto_id):
                         linea, created = LineaCarrito.objects.get_or_create(
                             carrito=carrito, producto=producto, variedad=variedad
                         )
-                        if created:
-                            linea.cantidad = cantidad
-                        else:
-                            linea.cantidad += cantidad
-                        linea.precio_unidad = producto.precio_unidad
+                        linea.cantidad += cantidad
+                        linea.precio_unidad = producto.precio
                         linea.save()
             else:
-                cantidad_total = form.cleaned_data['cantidad_total']
+                # Manejo de productos sin variedades
+                cantidad_total = form.cleaned_data.get('cantidad_total')
+                if cantidad_total is None:
+                    cantidad_total = 1  # Valor predeterminado si no se especifica cantidad
+
                 linea, created = LineaCarrito.objects.get_or_create(
                     carrito=carrito, producto=producto
                 )
@@ -74,14 +76,16 @@ def agregar_al_carrito(request, producto_id):
                     linea.cantidad = cantidad_total
                 else:
                     linea.cantidad += cantidad_total
-                linea.precio_unidad = producto.precio_unidad
+                linea.precio_unidad = producto.precio
                 linea.save()
+
             messages.success(request, f'{producto.nombre} ha sido agregado al carrito.')
-            return redirect('carrito')
+            return redirect('carritodecompras:ver_carrito')
     else:
         form = AgregarCarritoForm(producto=producto)
 
     return render(request, 'productos/detalle_producto.html', {'producto': producto, 'form': form})
+
 
 
 # Vista para eliminar un producto del carrito
@@ -100,22 +104,28 @@ def eliminar_producto(request, producto_id):
     return redirect('ver_carrito')
 
 # Vista para incrementar la cantidad de un producto en el carrito
-@login_required
-def incrementar_cantidad_producto(request, producto_id):
-    carrito = obtener_carrito_usuario(request)
-    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
-    linea.incrementar_cantidad()
-    messages.success(request, f'Se ha incrementado la cantidad de {linea.producto.nombre}.')
-    return redirect('carrito')
 
-# Vista para disminuir la cantidad de un producto en el carrito
 @login_required
 def disminuir_cantidad_producto(request, producto_id):
-    carrito = obtener_carrito_usuario(request)
+    """Disminuye la cantidad de un producto en el carrito."""
+    carrito = get_object_or_404(Carrito, usuario=request.user)
     linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
-    linea.disminuir_cantidad()
-    messages.success(request, f'Se ha disminuido la cantidad de {linea.producto.nombre}.')
-    return redirect('carrito')
+    if linea.cantidad > 1:
+        linea.cantidad -= 1
+        linea.save()
+    else:
+        linea.delete()
+    return redirect('carritodecompras:ver_carrito')
+
+@login_required
+def incrementar_cantidad_producto(request, producto_id):
+    """Incrementa la cantidad de un producto en el carrito."""
+    carrito = get_object_or_404(Carrito, usuario=request.user)
+    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
+    linea.cantidad += 1
+    linea.save()
+    return redirect('carritodecompras:ver_carrito')
+
 
 # Vistas para usuarios no autenticados (carro en sesión)
 def ver_carrito_sesion(request):
@@ -189,3 +199,41 @@ def actualizar_contacto_pedido(request, pedido_id):
         })
 
     return render(request, 'actualizar_contacto_pedido.html', {'form': form, 'pedido': pedido})
+
+@login_required
+def confirmar_pago(request):
+    # Obtener el carrito del usuario
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+    lineas = carrito.lineas.all()
+
+    # Verificar si el carrito está vacío
+    if not lineas:
+        messages.error(request, "Tu carrito está vacío. No puedes confirmar el pago.")
+        return redirect('carritodecompras:ver_carrito')
+
+    # Calcular el total del carrito
+    total_precio = sum(linea.get_subtotal() for linea in lineas)
+
+    # Obtener o crear el pedido asociado al usuario
+    pedido, created = Pedido.objects.get_or_create(
+        cliente=request.user,
+        estado="Pendiente",
+        defaults={'total': total_precio}
+    )
+
+    if not created:
+        # Actualizar el total del pedido si ya existe
+        pedido.total = total_precio
+        pedido.save()
+
+    # Marcar el pedido como confirmado
+    pedido.estado = "Confirmado"
+    pedido.save()
+
+    # Vaciar el carrito después de confirmar el pedido
+    carrito.lineas.all().delete()
+    messages.success(request, "Pedido confirmado exitosamente. ¡Gracias por tu compra!")
+
+    # Redirigir a una página de éxito o al historial de compras
+    return redirect('historialcompras:ver_historial')  # Ajusta esta redirección según tu proyecto
+

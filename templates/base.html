@@ -27,7 +27,7 @@
                         <li class="nav-item me-3"><a class="nav-link" href="{% url 'menu' %}">Menú</a></li>
                         
                         {% if not request.user.is_superuser %}
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'carrito' %}">Mi Carrito</a></li>
+                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'carritodecompras:ver_carrito' %}">Mi Carrito</a></li>
                         {% endif %}
                         
                         {% if user.is_authenticated %}

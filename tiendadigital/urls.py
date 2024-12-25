@@ -1,36 +1,27 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-# urls.py
 from django.conf import settings
 from django.conf.urls.static import static
 
-
-
-
-
-
-
 urlpatterns = [
-    # tiendadigital/urls.py
-
-
-
-
-    path('carritodecompras/', include('carritodecompras.urls')),
-    path('pagos/', include('pagos.urls')),
-    # otras rutas...
-
-
+    # Administración
     path('admin/', admin.site.urls),
+
+    # Autenticación
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-    path('', include('core.urls')),  # Enlaza con las URLs de la app core
-    path('usuarios/', include('usuarios.urls')),
-    path('productos/', include('productos.urls')),  # Enlaza con las URLs de la app productos
-    path('carritodecompras/', include('carritodecompras.urls')),  # Enlaza con las URLs de la app carrito
-    path('pagos/', include('pagos.urls')),  # Enlaza con las URLs de la app pagos
-    path('pedidos/', include('pedidos.urls')),  # Enlaza con las URLs de la app pedidos
-    path('promoOfertas/', include('promoOfertas.urls')),  # Enlaza con las URLs de la app promoOfertas
-    path('historialcompras/', include('historialcompras.urls')),  # Enlaza con las URLs de la app historialcompras
-       
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # Aplicaciones principales
+    path('', include('core.urls')),  # Rutas de la app core
+    path('usuarios/', include('usuarios.urls')),  # Rutas de la app usuarios
+    path('productos/', include('productos.urls')),  # Rutas de la app productos
+    path('carritodecompras/', include('carritodecompras.urls', namespace='carritodecompras')),  # Carrito
+    path('pagos/', include('pagos.urls')),  # Rutas de la app pagos
+    path('pedidos/', include('pedidos.urls')),  # Rutas de la app pedidos
+    path('promoOfertas/', include('promoOfertas.urls')),  # Rutas de la app promoOfertas
+    path('historialcompras/', include('historialcompras.urls')),  # Historial de compras
+]
+
+# Archivos estáticos y de medios
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
