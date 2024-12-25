@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'carritodecompras.apps.CarritodecomprasConfig',
+    'carritodecompras.apps.CarritodecomprasConfig',  # Asegúrate de que tu app esté incluida aquí
     'core',
     'usuarios',
     'productos',
@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'promoOfertas',
     'historialcompras',
 ]
+
 
 # Middleware
 MIDDLEWARE = [

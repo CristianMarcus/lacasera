@@ -1,17 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from productos.models import Producto
+from django.http import JsonResponse
+from productos.models import Producto, VariedadEmpanada
 from .models import LineaCarrito, Carrito
-from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
-from django.contrib.messages import get_messages
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Carrito
+from .forms import PedidoContactoForm, AgregarCarritoForm
 from pedidos.models import Pedido
-from .forms import PedidoContactoForm
+from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
 
 @login_required
 def ver_carrito(request):
@@ -38,7 +33,7 @@ def ver_carrito(request):
         'telefono': telefono,
     })
 
-    return render(request, 'ver_carrito.html', {
+    return render(request, 'carritodecompras/ver_carrito.html', {
         'carrito': carrito,
         'lineas': lineas,
         'total_items': total_items,
@@ -48,71 +43,98 @@ def ver_carrito(request):
     })
 
 
-
-
-
 @login_required
 def agregar_al_carrito(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
 
-    cantidad = int(request.POST.get('cantidad', 1))
-
-    linea, created = LineaCarrito.objects.get_or_create(carrito=carrito, producto=producto)
-    if created:
-        linea.cantidad = cantidad
+    if request.method == 'POST':
+        form = AgregarCarritoForm(request.POST, producto=producto)
+        if form.is_valid():
+            if producto.es_empanada:
+                for field_name, cantidad in form.cleaned_data.items():
+                    if field_name.startswith('variedad_') and cantidad > 0:
+                        variedad_id = int(field_name.split('_')[1])
+                        variedad = get_object_or_404(VariedadEmpanada, id=variedad_id)
+                        linea, created = LineaCarrito.objects.get_or_create(
+                            carrito=carrito, producto=producto, variedad=variedad
+                        )
+                        if created:
+                            linea.cantidad = cantidad
+                        else:
+                            linea.cantidad += cantidad
+                        linea.precio_unidad = producto.precio_unidad
+                        linea.save()
+            else:
+                cantidad_total = form.cleaned_data['cantidad_total']
+                linea, created = LineaCarrito.objects.get_or_create(
+                    carrito=carrito, producto=producto
+                )
+                if created:
+                    linea.cantidad = cantidad_total
+                else:
+                    linea.cantidad += cantidad_total
+                linea.precio_unidad = producto.precio_unidad
+                linea.save()
+            messages.success(request, f'{producto.nombre} ha sido agregado al carrito.')
+            return redirect('carrito')
     else:
-        linea.cantidad += cantidad
+        form = AgregarCarritoForm(producto=producto)
 
-    linea.save()
-    return redirect('carrito')
-
+    return render(request, 'productos/detalle_producto.html', {'producto': producto, 'form': form})
 
 
-
-
+# Vista para eliminar un producto del carrito
 @login_required
 def eliminar_producto(request, producto_id):
     carrito = obtener_carrito_usuario(request)
-    
-    try:
-        linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
-    except:
-        messages.error(request, 'El producto no se encuentra en tu carrito.')
-        return redirect('carrito')
-    
+    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
+
     if linea.cantidad > 1:
         linea.cantidad -= 1
         linea.save()
     else:
         linea.delete()
-    
-    messages.success(request, 'Producto eliminado del carrito.')
+
+    messages.success(request, f'{linea.producto.nombre} ha sido eliminado del carrito.')
+    return redirect('ver_carrito')
+
+# Vista para incrementar la cantidad de un producto en el carrito
+@login_required
+def incrementar_cantidad_producto(request, producto_id):
+    carrito = obtener_carrito_usuario(request)
+    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
+    linea.incrementar_cantidad()
+    messages.success(request, f'Se ha incrementado la cantidad de {linea.producto.nombre}.')
+    return redirect('carrito')
+
+# Vista para disminuir la cantidad de un producto en el carrito
+@login_required
+def disminuir_cantidad_producto(request, producto_id):
+    carrito = obtener_carrito_usuario(request)
+    linea = get_object_or_404(LineaCarrito, carrito=carrito, producto_id=producto_id)
+    linea.disminuir_cantidad()
+    messages.success(request, f'Se ha disminuido la cantidad de {linea.producto.nombre}.')
     return redirect('carrito')
 
 # Vistas para usuarios no autenticados (carro en sesión)
-
 def ver_carrito_sesion(request):
     carrito = request.session.get('carrito', {})
     total_carrito = sum(item['total_precio'] for item in carrito.values())
 
-    return render(request, 'carritodecompras/ver_carrito_sesion.html', {
+    return render(request, 'ver_carrito_sesion.html', {
         'carrito': carrito,
         'total_carrito': total_carrito
     })
 
-
-
-
-
 def agregar_producto_sesion(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     cantidad = int(request.POST.get('cantidad', 0))
-    
+
     if cantidad <= 0:
         messages.error(request, "La cantidad debe ser mayor que cero.")
         return redirect('ver_carrito_sesion')
-    
+
     carrito = actualizar_sesion_carrito(request, producto, cantidad)
     messages.success(request, f"{producto.nombre} fue agregado al carrito.")
     return redirect('ver_carrito_sesion')
@@ -120,23 +142,19 @@ def agregar_producto_sesion(request, producto_id):
 def eliminar_producto_sesion(request, producto_id):
     carrito = request.session.get('carrito', {})
     producto_id = str(producto_id)
-    
+
     if producto_id in carrito:
         if carrito[producto_id]['cantidad'] > 1:
             carrito[producto_id]['cantidad'] -= 1
             carrito[producto_id]['total_precio'] = float(carrito[producto_id]['precio']) * carrito[producto_id]['cantidad']
         else:
             del carrito[producto_id]  # Eliminar producto cuando la cantidad llega a cero
-    
+
     request.session['carrito'] = carrito  # Actualizar el carrito en la sesión
     messages.success(request, 'Producto eliminado del carrito.')
-    print("Carrito después de eliminar:", carrito)  # Debugging
     return redirect('ver_carrito_sesion')
 
-
-
 # Vistas para procesar pagos con Stripe y Mercado Pago
-
 @login_required
 def procesar_pago_stripe(request):
     # Lógica para procesar el pago con Stripe
@@ -147,18 +165,11 @@ def procesar_pago_mp(request):
     # Lógica para procesar el pago con Mercado Pago
     return render(request, 'carritodecompras/procesar_pago_mp.html')
 
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .forms import PedidoContactoForm
-from pedidos.models import Pedido
-
+# Vista para actualizar el contacto del pedido
 @login_required
 def actualizar_contacto_pedido(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
-    
+
     if request.method == 'POST':
         form = PedidoContactoForm(request.POST)
         if form.is_valid():
@@ -176,5 +187,5 @@ def actualizar_contacto_pedido(request, pedido_id):
             'direccion': pedido.direccion,
             'telefono': pedido.telefono,
         })
-    
-    return render(request, 'carritodecompras/actualizar_contacto_pedido.html', {'form': form, 'pedido': pedido})
+
+    return render(request, 'actualizar_contacto_pedido.html', {'form': form, 'pedido': pedido})

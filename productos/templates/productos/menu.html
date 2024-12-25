@@ -1,30 +1,29 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/menuStyle.css' %}">
-{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1>Menú de Productos</h1>
+<h1>Menú de Productos</h1>
+<div class="container mt-5">
     <div class="row">
         {% for producto in productos %}
         <div class="col-md-4">
-            <div class="card mb-4">
-                <!-- Verificamos si el producto tiene una imagen -->
-                {% if producto.imagen.has_pic %}
-                <img src="{{ producto.imagen.url }}" alt="Imagen del producto">
-                {% else %}
-                <p>No hay imagen disponible.</p>
-                {% endif %}
+            <div class="card mb-4 shadow-sm">
+                <img class="card-img-top" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
                     <p class="card-text">{{ producto.descripcion }}</p>
-                    <p><strong>Precio:</strong> ${{ producto.precio }}</p>
+                    <p>Precio por docena: ${{ producto.precio_docena }}</p>
+                    <p>Precio por media docena: ${{ producto.precio_media_docena }}</p>
+                    <p>Precio por unidad: ${{ producto.precio_unidad }}</p>
                     <form method="post" action="{% url 'agregar_al_carrito' producto.id %}">
                         {% csrf_token %}
-                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                        <button type="submit" class="btn btn-primary">Agregar al carrito</button>
+                        {% if producto.es_empanada %}
+                            <div class="form-group">
+                                {% for field in form %}
+                                    {{ field.label_tag }} {{ field }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
                     </form>
                 </div>
             </div>

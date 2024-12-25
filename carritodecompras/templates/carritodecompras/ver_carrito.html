@@ -21,6 +21,7 @@
         <thead class="thead-light">
             <tr>
                 <th>Producto</th>
+                <th>Variedad</th> <!-- Nueva columna para la variedad -->
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Total</th>
@@ -37,17 +38,35 @@
                     Producto eliminado
                     {% endif %}
                 </td>
-                <td>{{ linea.cantidad }}</td>
+                <td>
+                    {% if linea.variedad %}
+                    {{ linea.variedad.nombre_variedad }}
+                    {% else %}
+                    Variedad no especificada
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Incrementar y Disminuir cantidad -->
+                    <form method="POST" action="{% url 'disminuir_cantidad_producto' linea.producto.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary btn-sm">-</button>
+                    </form>
+                    {{ linea.cantidad }}
+                    <form method="POST" action="{% url 'incrementar_cantidad_producto' linea.producto.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary btn-sm">+</button>
+                    </form>
+                </td>
                 <td>
                     {% if linea.producto %}
-                    ${{ linea.producto.precio }}
+                    ${{ linea.variedad.precio_unidad }}
                     {% else %}
                     $0
                     {% endif %}
                 </td>
                 <td>
                     {% if linea.producto %}
-                    ${{ linea.producto.precio|multiply:linea.cantidad }}
+                    ${{ linea.get_subtotal }}
                     {% else %}
                     $0
                     {% endif %}
