@@ -1,12 +1,12 @@
 from django.urls import path
-from . import views
+from carritodecompras import views
 
 app_name = 'carritodecompras'
 
 urlpatterns = [
     # Rutas principales del carrito
     path('', views.ver_carrito, name='ver_carrito'),  # Página principal del carrito
-    path('agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar'),  # Agregar producto
+    path('agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
     path('eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),  # Eliminar producto
     path('disminuir/<int:producto_id>/', views.disminuir_cantidad_producto, name='disminuir_cantidad_producto'),  # Disminuir cantidad
     path('incrementar/<int:producto_id>/', views.incrementar_cantidad_producto, name='incrementar_cantidad_producto'),  # Incrementar cantidad

@@ -10,12 +10,13 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Redirecciones de autenticación
-LOGIN_REDIRECT_URL = 'listar_productos'  # Redirige después del login
+LOGIN_REDIRECT_URL = 'productos:listar_productos'  # Redirige después del login
 LOGOUT_REDIRECT_URL = 'login'  # Redirige después del logout
 LOGIN_URL = '/usuarios/login/'  # URL de inicio de sesión
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
+    'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

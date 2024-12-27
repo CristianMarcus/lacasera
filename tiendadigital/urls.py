@@ -14,7 +14,7 @@ urlpatterns = [
     # Aplicaciones principales
     path('', include('core.urls')),  # Rutas de la app core
     path('usuarios/', include('usuarios.urls')),  # Rutas de la app usuarios
-    path('productos/', include('productos.urls')),  # Rutas de la app productos
+    path('productos/', include('productos.urls', namespace='productos')),  # Rutas de la app productos
     path('carritodecompras/', include('carritodecompras.urls', namespace='carritodecompras')),  # Carrito
     path('pagos/', include('pagos.urls')),  # Rutas de la app pagos
     path('pedidos/', include('pedidos.urls')),  # Rutas de la app pedidos

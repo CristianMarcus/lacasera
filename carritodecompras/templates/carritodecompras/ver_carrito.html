@@ -3,7 +3,6 @@
 {% block title %}Carrito de Compras{% endblock %}
 
 {% block content %}
-{% load custom_filters %}
 <div class="container mt-5">
     <!-- Mostrar mensajes de Django -->
     {% if messages %}
@@ -21,7 +20,6 @@
         <thead class="thead-light">
             <tr>
                 <th>Producto</th>
-                <th>Variedad</th> <!-- Nueva columna para la variedad -->
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Total</th>
@@ -39,13 +37,6 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if linea.variedad %}
-                    {{ linea.variedad.nombre_variedad }}
-                    {% else %}
-                    Variedad no especificada
-                    {% endif %}
-                </td>
-                <td>
                     <!-- Incrementar y Disminuir cantidad -->
                     <form method="POST" action="{% url 'carritodecompras:disminuir_cantidad_producto' linea.producto.id %}" style="display:inline;">
                         {% csrf_token %}
@@ -58,26 +49,16 @@
                     </form>
                 </td>
                 <td>
-                    {% if linea.producto %}
-                    ${{ linea.precio_unidad }}
-                    {% else %}
-                    $0
-                    {% endif %}
+                    ${{ linea.precio_unidad|floatformat:2 }}
                 </td>
                 <td>
-                    {% if linea.producto %}
-                    ${{ linea.get_subtotal }}
-                    {% else %}
-                    $0
-                    {% endif %}
+                    ${{ linea.get_subtotal|floatformat:2 }}
                 </td>
                 <td>
-                    {% if linea.producto %}
                     <form method="POST" action="{% url 'carritodecompras:eliminar_producto' linea.producto.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                     </form>
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -87,7 +68,7 @@
     <!-- Totales -->
     <div class="totales">
         <h4>Total de artículos: {{ total_items }}</h4>
-        <h4>Total a pagar: ${{ total_precio }}</h4>
+        <h4>Total a pagar: ${{ carrito.total|floatformat:2 }}</h4>
     </div>
 
     <!-- Botones de pago -->
@@ -127,55 +108,15 @@
                     <p>¿Estás seguro de que deseas confirmar el pedido y proceder con el pago?</p>
                     <form method="post" action="{% url 'carritodecompras:confirmar_pago' %}">
                         {% csrf_token %}
-                        <input type="hidden" name="direccion" value="{{ form.direccion.value }}">
-                        <input type="hidden" name="telefono" value="{{ form.telefono.value }}">
                         <button type="submit" class="btn btn-success">Confirmar Pedido</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
     {% else %}
-    <p>El carrito está vacío. <a href="{% url 'menu' %}">Continuar Comprando</a></p>
+    <p>El carrito está vacío. <a href="{% url 'productos:menu' %}">Continuar Comprando</a></p>
     {% endif %}
-    <a href="{% url 'menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
+    <a href="{% url 'productos:menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const contactoPedidoForm = document.getElementById('contactoPedidoForm');
-        contactoPedidoForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            const formData = new FormData(contactoPedidoForm);
-            fetch(contactoPedidoForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Network response was not ok.');
-                }
-            })
-            .then(data => {
-                if (data.success) {
-                    alert('Información de contacto para el pedido actualizada con éxito.');
-                    window.location.reload();
-                } else {
-                    console.error('Form errors:', data.errors);
-                    alert('Hubo un error al actualizar la información de contacto. Inténtalo de nuevo.');
-                }
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-                alert('Hubo un error al actualizar la información de contacto. Inténtalo de nuevo.');
-            });
-        });
-    });
-</script>
 {% endblock %}

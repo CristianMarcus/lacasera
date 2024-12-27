@@ -2,17 +2,17 @@ from django.db import models
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
-    
+
     def __str__(self):
         return self.nombre
 
+
 class Producto(models.Model):
     nombre = models.CharField(max_length=255)
-    precio_docena = models.DecimalField(max_digits=10, decimal_places=2, default=14000)
-    precio_media_docena = models.DecimalField(max_digits=10, decimal_places=2, default=8000)
-    precio_unidad = models.DecimalField(max_digits=10, decimal_places=2, default=2000)
+    precio_docena = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_media_docena = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_unidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     descripcion = models.TextField()
-    precio = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     disponible = models.BooleanField(default=True)
     stock = models.IntegerField(default=0)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos', null=True, blank=True)
@@ -21,6 +21,16 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    def get_precio(self, cantidad):
+        """Devuelve el precio según la cantidad para empanadas."""
+        if self.es_empanada:
+            if cantidad >= 12:
+                return self.precio_docena or self.precio_unidad
+            elif cantidad >= 6:
+                return self.precio_media_docena or self.precio_unidad
+        return self.precio_unidad
+        
 
 class VariedadEmpanada(models.Model):
     producto = models.ForeignKey(Producto, related_name='variedades', on_delete=models.CASCADE)

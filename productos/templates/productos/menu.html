@@ -1,34 +1,61 @@
 {% extends 'base.html' %}
 
+{% load humanize %} <!-- Importar la librería humanize para formatear los números -->
+
+{% block title %}Menú de Productos{% endblock %}
+
 {% block content %}
-<h1>Menú de Productos</h1>
+<h1 class="text-center mt-4">Menú de Productos</h1>
+
 <div class="container mt-5">
+    {% if productos %}
     <div class="row">
-        {% for producto in productos %}
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <img class="card-img-top" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+        {% for item in productos %}
+        <div class="col-md-4 mb-4">
+            <div class="card product-card shadow-sm {% if item.precios.precio_docena %}empanada{% endif %}">
+                {% if item.producto.imagen %}
+                <img class="card-img-top product-image" src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
+                {% else %}
+                <img class="card-img-top product-image" src="/static/images/placeholder.png" alt="Imagen no disponible">
+                {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
-                    <p class="card-text">{{ producto.descripcion }}</p>
-                    <p>Precio por docena: ${{ producto.precio_docena }}</p>
-                    <p>Precio por media docena: ${{ producto.precio_media_docena }}</p>
-                    <p>Precio por unidad: ${{ producto.precio_unidad }}</p>
-                    <form method="post" action="{% url 'agregar_al_carrito' producto.id %}">
-                        {% csrf_token %}
-                        {% if producto.es_empanada %}
-                            <div class="form-group">
-                                {% for field in form %}
-                                    {{ field.label_tag }} {{ field }}
-                                {% endfor %}
-                            </div>
+                    <h5 class="card-title text-center">{{ item.producto.nombre }}</h5>
+                    <p class="card-text text-muted">{{ item.producto.descripcion|truncatechars:100 }}</p>
+
+                    <p>
+                        {% if item.precios.precio_docena %}
+                        <strong>Precio por docena:</strong> ${{ item.precios.precio_docena|intcomma }}<br>
+                        <strong>Precio por media docena:</strong> ${{ item.precios.precio_media_docena|intcomma }}<br>
+                        <strong>Precio por unidad:</strong> ${{ item.precios.precio_unidad|intcomma }}
+                        {% else %}
+                        <strong>Precio:</strong> ${{ item.precios.precio_unidad|intcomma }}
                         {% endif %}
-                        <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
-                    </form>
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'productos:detalle_producto' item.producto.id %}" class="btn btn-primary btn-sm">Ver más</a>
+                        {% if item.producto.disponible %}
+                        <form method="post" action="{% url 'productos:agregar_al_carrito' item.producto.id %}">
+                            {% csrf_token %}
+                            <div class="form-group mb-2">
+                                <label for="cantidad-{{ item.producto.id }}" class="form-label">Cantidad:</label>
+                                <input type="number" class="form-control form-control-sm" id="cantidad-{{ item.producto.id }}" name="cantidad" min="1" value="1">
+                            </div>
+                            <button type="submit" class="btn btn-secondary btn-sm">Agregar al carrito</button>
+                        </form>
+                        {% else %}
+                        <p class="text-danger">Producto no disponible.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <strong>No hay productos disponibles en este momento.</strong>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
