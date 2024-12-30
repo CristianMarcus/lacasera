@@ -1,6 +1,6 @@
 from django import forms
 from .models import Carrito, LineaCarrito
-from productos.models import VariedadEmpanada
+
 
 
 class CarritoForm(forms.ModelForm):
@@ -24,12 +24,7 @@ class AgregarCarritoForm(forms.Form):
         producto = kwargs.pop('producto', None)
         super().__init__(*args, **kwargs)
 
-        if producto and producto.es_empanada:
-            variedades = VariedadEmpanada.objects.filter(producto=producto)
-            for variedad in variedades:
-                self.fields[f'variedad_{variedad.id}'] = forms.IntegerField(
-                    min_value=0, required=False, label=variedad.nombre_variedad
-                )
+    
         
 
 

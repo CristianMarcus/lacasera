@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from productos.models import Producto, VariedadEmpanada
+from productos.models import Producto
 from .models import LineaCarrito, Carrito
 from .forms import PedidoContactoForm, AgregarCarritoForm
 from pedidos.models import Pedido
@@ -48,29 +48,35 @@ def ver_carrito(request):
     })
 
 
-
-
 @login_required
 def agregar_al_carrito(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
-    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
 
-    cantidad = int(request.POST.get('cantidad', 1))
-    if cantidad <= 0:
-        messages.error(request, "La cantidad debe ser un número positivo.")
-        return redirect('productos:menu')
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 1))
+        if cantidad <= 0:
+            messages.error(request, "La cantidad debe ser mayor que cero.")
+            return redirect('productos:detalle_producto', producto_id=producto.id)
 
-    linea, created = LineaCarrito.objects.get_or_create(
-        carrito=carrito, producto=producto,
-        defaults={'cantidad': cantidad, 'precio_unidad': producto.precio_unidad}
-    )
+        # Agregar o actualizar el producto en el carrito
+        linea, created = LineaCarrito.objects.get_or_create(
+            carrito=carrito,
+            producto=producto,
+            defaults={'cantidad': cantidad, 'precio': producto.precio}
+        )
 
-    if not created:
-        linea.cantidad += cantidad
+        if not created:
+            # Incrementar cantidad si la línea ya existía
+            linea.incrementar_cantidad(cantidad)
         linea.save()
 
-    messages.success(request, f"Agregaste {cantidad} unidades de {producto.nombre} al carrito.")
-    return redirect('carritodecompras:ver_carrito')
+        messages.success(request, f"{producto.nombre} ha sido agregado al carrito.")
+        return redirect('carritodecompras:ver_carrito')
+
+    return redirect('productos:detalle_producto', producto_id=producto.id)
+
+
 
 @login_required
 def eliminar_producto(request, producto_id):
@@ -151,18 +157,25 @@ def actualizar_contacto_pedido(request, pedido_id):
     if request.method == 'POST':
         form = PedidoContactoForm(request.POST)
         if form.is_valid():
+            # Actualizar los datos de contacto del pedido
             pedido.direccion = form.cleaned_data['direccion']
             pedido.telefono = form.cleaned_data['telefono']
             pedido.save()
-            return JsonResponse({'success': True})
-        return JsonResponse({'success': False, 'errors': form.errors})
+            
+            # Redirigir al carrito después de la actualización
+            messages.success(request, "Datos de contacto actualizados correctamente.")
+            return redirect('pedidos:listar_pedidos')
+        else:
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
 
+    # Mostrar el formulario con los datos actuales si el método no es POST
     form = PedidoContactoForm(initial={
         'direccion': pedido.direccion,
         'telefono': pedido.telefono,
     })
 
-    return render(request, 'carritodecompras/actualizar_contacto_pedido.html', {'form': form, 'pedido': pedido})
+    return render(request, 'pedidos/listar_pedidos.html', {'form': form, 'pedido': pedido})
+
 
 @login_required
 def confirmar_pago(request):
@@ -191,4 +204,4 @@ def confirmar_pago(request):
     carrito.lineas.all().delete()
     messages.success(request, "Pedido confirmado exitosamente. ¡Gracias por tu compra!")
 
-    return redirect('historialcompras:ver_historial')
+    return redirect('pedidos:listar_pedidos')

@@ -1,6 +1,13 @@
 from django.urls import path
-from . import views
+from .views import ver_historial
+
+app_name = 'historialcompras'
 
 urlpatterns = [
-path('', views.index, name='historialdecompras_index'),
+    
+path('historial/', ver_historial, name='ver_historial'),
+
 ]
+
+
+

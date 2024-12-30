@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from productos.models import Producto, VariedadEmpanada
+from productos.models import Producto
 from django.utils import timezone
 
 
@@ -14,21 +14,27 @@ class Carrito(models.Model):
         """Calcula el total del carrito sumando los subtotales de las líneas."""
         return sum(linea.get_subtotal() for linea in self.lineas.all())
 
-    def agregar_producto(self, producto, cantidad=1, variedad=None):
-        """Agrega un producto al carrito o incrementa su cantidad."""
-        linea, creada = self.lineas.get_or_create(producto=producto, variedad=variedad)
-        if creada:
-            # Asegurarse de asignar el precio del producto actual
-            linea.precio_unidad = producto.precio_unidad
-        else:
+    def agregar_producto(self, producto, cantidad=1):
+        """
+        Agrega un producto al carrito o incrementa su cantidad.
+        Si la línea no existe, la crea con el precio del producto actual.
+        """
+        linea, creada = self.lineas.get_or_create(
+            producto=producto,
+            defaults={'cantidad': cantidad, 'precio': producto.precio}
+        )
+        if not creada:
+            # Incrementa la cantidad si ya existe
             linea.incrementar_cantidad(cantidad)
-        linea.save()
         return linea
 
-    def eliminar_producto(self, producto, cantidad=1, variedad=None):
-        """Elimina una cantidad específica de un producto del carrito o elimina la línea completa si la cantidad llega a 0."""
+    def eliminar_producto(self, producto, cantidad=1):
+        """
+        Elimina una cantidad específica de un producto del carrito.
+        Si la cantidad llega a 0, elimina la línea completa.
+        """
         try:
-            linea = self.lineas.get(producto=producto, variedad=variedad)
+            linea = self.lineas.get(producto=producto)
             if cantidad >= linea.cantidad:
                 linea.delete()
             else:
@@ -48,11 +54,8 @@ class Carrito(models.Model):
 class LineaCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='lineas', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    variedad = models.ForeignKey(
-        VariedadEmpanada, null=True, blank=True, on_delete=models.CASCADE
-    )  # Opcional, en caso de productos con variedades
     cantidad = models.PositiveIntegerField(default=1)
-    precio_unidad = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def incrementar_cantidad(self, cantidad=1):
         """Incrementa la cantidad de este producto en el carrito."""
@@ -60,7 +63,10 @@ class LineaCarrito(models.Model):
         self.save()
 
     def disminuir_cantidad(self, cantidad=1):
-        """Disminuye la cantidad o elimina la línea si llega a 0."""
+        """
+        Disminuye la cantidad de este producto en el carrito.
+        Si la cantidad llega a 0, elimina la línea.
+        """
         self.cantidad -= cantidad
         if self.cantidad <= 0:
             self.delete()
@@ -69,13 +75,7 @@ class LineaCarrito(models.Model):
 
     def get_subtotal(self):
         """Calcula el subtotal para esta línea."""
-        return self.cantidad * self.precio_unidad
-
-    def save(self, *args, **kwargs):
-        """Asegura que el precio por unidad esté siempre sincronizado con el precio del producto."""
-        if self.precio_unidad != self.producto.precio_unidad:
-            self.precio_unidad = self.producto.precio_unidad
-        super().save(*args, **kwargs)
+        return self.cantidad * self.precio
 
     def __str__(self):
-        return f"{self.cantidad} x {self.producto.nombre}"
+        return f"{self.cantidad} x {self.producto.nombre} (Precio: ${self.precio})"

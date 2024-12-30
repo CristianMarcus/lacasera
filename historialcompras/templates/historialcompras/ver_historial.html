@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Compras{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Historial de Compras</h1>
+    
+    {% if pedidos %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID del Pedido</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.id }}</td>
+                    <td>{{ pedido.fecha|date:"d M Y H:i" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if pedido.estado == 'Pendiente' %}bg-warning
+                            {% elif pedido.estado == 'Confirmado' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {{ pedido.estado }}
+                        </span>
+                    </td>
+                    <td>${{ pedido.total|floatformat:2 }}</td>
+                    <td>
+                        <a href="{% url 'historialcompras:detalle_pedido' pedido.id %}" class="btn btn-primary btn-sm">Ver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <strong>No tienes pedidos en tu historial.</strong>
+    </div>
+    {% endif %}
+    
+    <a href="{% url 'productos:menu' %}" class="btn btn-secondary mt-3">Volver al Menú</a>
+</div>
+{% endblock %}

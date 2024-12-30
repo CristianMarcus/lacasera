@@ -93,9 +93,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internacionalización
 LANGUAGE_CODE = 'es-es'
-TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
+TIME_ZONE = 'America/Argentina/Buenos_Aires'  # Ajusta según tu región
+
+
 
 # Configuración de medios
 MEDIA_URL = '/media/'

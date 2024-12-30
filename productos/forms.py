@@ -4,31 +4,22 @@ from .models import Producto
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = [
-            'nombre', 
-            'descripcion', 
-            'precio_docena', 
-            'precio_media_docena', 
-            'precio_unidad', 
-            'imagen', 
-            'disponible', 
-            'stock', 
-            'categoria', 
-            'es_empanada'
-        ]
-
-    def __init__(self, *args, **kwargs):
-        self.instance_id = kwargs.get('instance').id if kwargs.get('instance') else None
-        super().__init__(*args, **kwargs)
+        fields = ['nombre', 'descripcion', 'precio', 'imagen', 'disponible']
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
+        # Obtener la instancia del formulario
+        instance_id = self.instance.id if self.instance else None
+
+        # Verificar si ya existe un producto con el mismo nombre
         productos = Producto.objects.filter(nombre=nombre)
-        if self.instance_id:
-            productos = productos.exclude(id=self.instance_id)
+        if instance_id:
+            productos = productos.exclude(id=instance_id)
+
         if productos.exists():
             raise forms.ValidationError('Ya existe un producto con ese nombre.')
         return nombre
+
 
     def clean(self):
         cleaned_data = super().clean()

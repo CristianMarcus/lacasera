@@ -10,7 +10,7 @@
 
 {% if producto.es_empanada %}
     <!-- Formulario para productos con variedades -->
-    <form method="POST" action="{% url 'carritodecompras:agregar' producto.id %}">
+    <form method="POST" action="{% url 'carritodecompras:agregar_al_carrito' producto.id %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary mt-3">Agregar al carrito</button>

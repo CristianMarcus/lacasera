@@ -1,21 +1,11 @@
 from django.contrib import admin
-from .models import Producto, Categoria, VariedadEmpanada
+from .models import Producto, Categoria
 
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio_docena', 'precio_media_docena', 'precio_unidad', 'stock', 'disponible')
-    list_filter = ('disponible', 'categoria', 'es_empanada')
-    list_editable = ('precio_docena', 'precio_media_docena', 'precio_unidad', 'stock', 'disponible')
-    search_fields = ('nombre', 'categoria__nombre')
-    prepopulated_fields = {'nombre': ('nombre',)}
-
-class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
-
-class VariedadEmpanadaAdmin(admin.ModelAdmin):
-    list_display = ('producto', 'nombre_variedad')
-    search_fields = ('producto__nombre', 'nombre_variedad')
+    list_display = ('id', 'nombre', 'precio', 'descripcion', 'disponible', 'stock', 'categoria')  # Ajusta los campos a los existentes
+    list_filter = ('disponible', 'categoria')  # Elimina 'es_empanada'
+    list_editable = ('precio', 'stock', 'disponible')  # Ajusta los campos editables a los que existen
+    search_fields = ('nombre', 'descripcion')
 
 admin.site.register(Producto, ProductoAdmin)
-admin.site.register(Categoria, CategoriaAdmin)
-admin.site.register(VariedadEmpanada, VariedadEmpanadaAdmin)
+admin.site.register(Categoria)

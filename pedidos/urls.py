@@ -9,6 +9,8 @@ from .views import (
     eliminar_pedido,
 )
 
+app_name = 'pedidos'
+
 urlpatterns = [
     path('realizar/', realizar_pedido, name='realizar_pedido'),
     path('confirmar_pago/', confirmar_pago, name='confirmar_pago'),

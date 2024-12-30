@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
-from .models import Producto, VariedadEmpanada
+from .models import Producto
 from .forms import ProductoForm
 from carritodecompras.forms import AgregarCarritoForm
 from carritodecompras.models import LineaCarrito, Carrito
@@ -26,34 +26,14 @@ def agregar_al_carrito(request, producto_id):
                 messages.error(request, "La cantidad debe ser mayor que cero.")
                 return redirect('productos:detalle_producto', producto_id=producto.id)
 
-            if producto.es_empanada:
-                for field_name, cantidad in form.cleaned_data.items():
-                    if field_name.startswith('variedad_') and cantidad > 0:
-                        variedad_id = int(field_name.split('_')[1])
-                        variedad = get_object_or_404(VariedadEmpanada, id=variedad_id)
-
-                        precio_unidad = producto.precio_unidad
-                        if cantidad >= 12:
-                            precio_unidad = producto.precio_docena
-                        elif cantidad >= 6:
-                            precio_unidad = producto.precio_media_docena
-
-                        linea, created = LineaCarrito.objects.get_or_create(
-                            carrito=carrito, producto=producto, variedad=variedad,
-                            defaults={'precio_unidad': precio_unidad}
-                        )
-                        if not created:
-                            linea.cantidad += cantidad
-                            linea.precio_unidad = precio_unidad
-                        linea.save()
-            else:
-                linea, created = LineaCarrito.objects.get_or_create(
-                    carrito=carrito, producto=producto,
-                    defaults={'cantidad': cantidad_total, 'precio_unidad': producto.precio_unidad}
-                )
-                if not created:
-                    linea.cantidad += cantidad_total
-                    linea.save()
+            # Manejo de productos genéricos con un solo precio
+            linea, created = LineaCarrito.objects.get_or_create(
+                carrito=carrito, producto=producto,
+                defaults={'cantidad': cantidad_total, 'precio_unidad': producto.precio}
+            )
+            if not created:
+                linea.cantidad += cantidad_total
+                linea.save()
 
             messages.success(request, f"{producto.nombre} ha sido agregado al carrito.")
             return redirect('carritodecompras:ver_carrito')
@@ -62,24 +42,13 @@ def agregar_al_carrito(request, producto_id):
     return render(request, 'productos/detalle_producto.html', {'producto': producto, 'form': form})
 
 
+
 def menu(request):
-    productos = Producto.objects.filter(disponible=True)
-    productos_con_precios = []
+    productos = Producto.objects.all()
+    return render(request, 'productos/menu.html', {'productos': productos})
 
-    for producto in productos:
-        precios = {'precio_unidad': producto.precio_unidad}
-        if producto.es_empanada:
-            precios.update({
-                'precio_docena': producto.precio_docena,
-                'precio_media_docena': producto.precio_media_docena,
-            })
 
-        productos_con_precios.append({
-            'producto': producto,
-            'precios': precios,
-        })
 
-    return render(request, 'productos/menu.html', {'productos': productos_con_precios})
 
 @user_passes_test(is_superuser, login_url='productos:menu')
 def listar_productos(request):

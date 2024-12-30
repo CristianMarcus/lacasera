@@ -4,6 +4,7 @@ from django.contrib import messages
 from carritodecompras.models import Carrito  # Modelos del carrito
 from pedidos.models import Pedido, LineaPedido  # Modelos de pedidos
 from productos.models import Producto  # Asegúrate de importar Producto
+from django.core.exceptions import PermissionDenied
 
 # Verificación de usuario administrador
 def es_admin(user):
@@ -16,7 +17,7 @@ def cambiar_estado_pedido(request, pedido_id, nuevo_estado):
     pedido.estado = nuevo_estado
     pedido.save()
     messages.success(request, f'El estado del pedido {pedido_id} ha sido actualizado a {nuevo_estado}.')
-    return redirect('listar_pedidos')
+    return redirect('pedidos:listar_pedidos')
 
 @login_required
 def listar_pedidos(request):
@@ -58,21 +59,24 @@ def eliminar_pedido(request, pedido_id):
     else:
         messages.error(request, "No tienes permiso para eliminar este pedido.")
     
-    return redirect('listar_pedidos')
+    return redirect('pedidos:listar_pedidos')
 
 @login_required
 def detalle_pedido(request, pedido_id):
     # Permitir acceso al administrador y al propietario del pedido
     pedido = get_object_or_404(Pedido, id=pedido_id)
     if not request.user.is_superuser and pedido.cliente != request.user:
-        return render(request, '403.html')  # Mostrar página 403 si el usuario no tiene permiso
+        raise PermissionDenied
 
-    lineas = pedido.lineas.all()
-    for linea in lineas:
-        linea.subtotal = linea.precio_unitario * linea.cantidad
-    total = sum(linea.subtotal for linea in lineas)  # Calcular el total del pedido
+    lineas = pedido.lineas.all()  # Obtiene todas las líneas del pedido
+    total = sum(linea.get_subtotal() for linea in lineas)  # Usa el método del modelo para calcular subtotales
 
-    return render(request, 'pedidos/detalle_pedido.html', {'pedido': pedido, 'lineas': lineas, 'total': total})
+    return render(request, 'pedidos/detalle_pedido.html', {
+        'pedido': pedido,
+        'lineas': lineas,
+        'total': total
+    })
+
 
 @login_required
 def confirmar_pago_efectivo(request):
@@ -152,6 +156,6 @@ def confirmar_pago(request):
         messages.success(request, 'Pedido confirmado con éxito, ¡Gracias por tu compra!')
 
         # Redirigir a una página de confirmación o pedidos
-        return redirect('listar_pedidos')  # O redirigir a una página de confirmación
+        return redirect('pedidos:listar_pedidos')
 
     return render(request, 'pedidos/confirmar_pago.html', {'carrito': carrito})
