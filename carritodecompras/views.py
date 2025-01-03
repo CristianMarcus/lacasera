@@ -5,8 +5,9 @@ from django.http import JsonResponse
 from productos.models import Producto
 from .models import LineaCarrito, Carrito
 from .forms import PedidoContactoForm, AgregarCarritoForm
-from pedidos.models import Pedido
+from pedidos.models import Pedido, LineaPedido
 from .utils import obtener_carrito_usuario, actualizar_sesion_carrito
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def ver_carrito(request):
@@ -32,10 +33,18 @@ def ver_carrito(request):
         pedido.total = total_precio
         pedido.save()
 
+    # Verificar si hay datos en la sesión para dirección y teléfono
+    direccion = request.session.get('direccion', pedido.direccion)
+    telefono = request.session.get('telefono', pedido.telefono)
+
+    # Imprimir los datos de la sesión
+    print("Dirección de la sesión:", direccion)
+    print("Teléfono de la sesión:", telefono)
+
     # Preparar el formulario de contacto
     form = PedidoContactoForm(initial={
-        'direccion': pedido.direccion or '',
-        'telefono': pedido.telefono or '',
+        'direccion': direccion,
+        'telefono': telefono,
     })
 
     return render(request, 'carritodecompras/ver_carrito.html', {
@@ -44,7 +53,17 @@ def ver_carrito(request):
         'total_items': total_items,
         'total_precio': total_precio,
         'form': form,
-        'pedido': pedido,  # Asegúrate de pasar 'pedido' al contexto
+        'pedido': pedido,  # Agregado al contexto
+    })
+
+
+    return render(request, 'carritodecompras/ver_carrito.html', {
+        'carrito': carrito,
+        'lineas': lineas,
+        'total_items': total_items,
+        'total_precio': total_precio,
+        'form': form,
+        'pedido': pedido,  # Agregado al contexto
     })
 
 
@@ -151,43 +170,56 @@ def procesar_pago_mp(request):
     return render(request, 'carritodecompras/procesar_pago_mp.html')
 
 @login_required
-def actualizar_contacto_pedido(request, pedido_id):
+def actualizar_contacto(request, pedido_id):
+    # Obtén el pedido correspondiente
     pedido = get_object_or_404(Pedido, id=pedido_id)
-
+    
     if request.method == 'POST':
         form = PedidoContactoForm(request.POST)
         if form.is_valid():
-            # Actualizar los datos de contacto del pedido
-            pedido.direccion = form.cleaned_data['direccion']
-            pedido.telefono = form.cleaned_data['telefono']
-            pedido.save()
+            # Solo actualizamos la sesión, no la base de datos
+            direccion = form.cleaned_data['direccion']
+            telefono = form.cleaned_data['telefono']
             
-            # Redirigir al carrito después de la actualización
-            messages.success(request, "Datos de contacto actualizados correctamente.")
-            return redirect('pedidos:listar_pedidos')
+            # Guardamos los datos actualizados en la sesión
+            request.session['direccion'] = direccion
+            request.session['telefono'] = telefono
+
+            messages.success(request, "El contacto se actualizó correctamente en la sesión.")
+            
+            # Imprimir los datos que realmente se están guardando en la sesión
+            print("Dirección guardada en la sesión:", request.session.get('direccion'))
+            print("Teléfono guardado en la sesión:", request.session.get('telefono'))
+            
+            return redirect('carritodecompras:ver_carrito')  # Redirigimos al carrito
+
         else:
-            messages.error(request, "Por favor, corrige los errores en el formulario.")
+            print(form.errors)  # Muestra los errores en consola para depuración
+    else:
+        initial_data = {
+            'direccion': request.session.get('direccion', pedido.direccion or ''),
+            'telefono': request.session.get('telefono', pedido.telefono or ''),
+        }
+        form = PedidoContactoForm(initial=initial_data)
 
-    # Mostrar el formulario con los datos actuales si el método no es POST
-    form = PedidoContactoForm(initial={
-        'direccion': pedido.direccion,
-        'telefono': pedido.telefono,
-    })
-
-    return render(request, 'pedidos/listar_pedidos.html', {'form': form, 'pedido': pedido})
+    return render(request, 'carritodecompras/actualizar_contacto.html', {'form': form, 'pedido': pedido})
 
 
 @login_required
 def confirmar_pago(request):
+    # Obtener o crear el carrito del usuario actual
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
     lineas = carrito.lineas.all()
 
+    # Verificar si el carrito está vacío
     if not lineas:
         messages.error(request, "Tu carrito está vacío. No puedes confirmar el pago.")
         return redirect('carritodecompras:ver_carrito')
 
+    # Calcular el precio total del carrito
     total_precio = sum(linea.get_subtotal() for linea in lineas)
 
+    # Obtener o crear un pedido en estado "Pendiente" para el usuario actual
     pedido, created = Pedido.objects.get_or_create(
         cliente=request.user,
         estado="Pendiente",
@@ -195,13 +227,48 @@ def confirmar_pago(request):
     )
 
     if not created:
+        # Si el pedido ya existía, actualizar el total
         pedido.total = total_precio
-        pedido.save()
 
+    # Cambiar el estado del pedido a "Confirmado"
     pedido.estado = "Confirmado"
+
+    # Usar los datos de la sesión si existen
+    # Primero asignamos la dirección de la sesión, si existe
+    if 'direccion' in request.session:
+        pedido.direccion = request.session['direccion']
+    else:
+    # Si no está en la sesión, usamos la dirección de la base de datos
+        pedido.direccion = pedido.cliente.address
+
+# Luego, asignamos el teléfono de la sesión, si existe
+    if 'telefono' in request.session:
+        pedido.telefono = request.session['telefono']
+    else:
+    # Si no está en la sesión, usamos el teléfono de la base de datos
+        pedido.telefono = pedido.cliente.phone_number
+
+
+    # Imprimir los datos que se están utilizando
+    print("Dirección confirmada:", pedido.direccion)
+    print("Teléfono confirmado:", pedido.telefono)
+
+    # Guardar el pedido
     pedido.save()
 
+    # Crear las líneas de pedido para cada producto en el carrito
+    for linea_carrito in lineas:
+        LineaPedido.objects.create(
+            pedido=pedido,
+            producto=linea_carrito.producto,
+            cantidad=linea_carrito.cantidad,
+            precio_unitario=linea_carrito.precio
+        )
+
+    # Vaciar el carrito de compras
     carrito.lineas.all().delete()
+
     messages.success(request, "Pedido confirmado exitosamente. ¡Gracias por tu compra!")
 
+    # Redirigir al listado de pedidos del usuario actual
     return redirect('pedidos:listar_pedidos')

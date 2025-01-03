@@ -11,9 +11,9 @@
     </ul>
 {% endif %}
 
-<form method="POST">
+<form method="post" action="{% url 'usuarios:actualizar_contacto' %}">
     {% csrf_token %}
-    {{ form.as_p }}  <!-- Renderiza los campos del formulario -->
+    {{ form.as_p }}
     <button type="submit">Guardar y proceder</button>
 </form>
 {% endblock %}

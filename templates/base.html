@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}La Casera{% endblock %}</title>
-    
+
     {% block extra_css %}
     <!-- Usar solo uno: CDN o archivo local -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,22 +21,37 @@
                 <a class="navbar-brand" href="{% url 'index' %}">
                     <img src="{% static 'productos/img/lacasera_logo.jpeg' %}" alt="Logo de La Casera" class="logo">
                 </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'index' %}">Inicio</a></li>
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'productos:menu' %}">Menú</a></li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'productos:menu' %}active{% endif %}" href="{% url 'productos:menu' %}">Menú</a>
+                        </li>
                         {% if not request.user.is_superuser %}
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'carritodecompras:ver_carrito' %}">Mi Carrito</a></li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'carritodecompras:ver_carrito' %}active{% endif %}" href="{% url 'carritodecompras:ver_carrito' %}">Mi Carrito</a>
+                        </li>
                         {% endif %}
-                        
+
                         {% if user.is_authenticated %}
-                        <li class="nav-item me-3"><span class="msjhome">Bienvenido, {{ user.username }}!</span></li>
-                        
+                        <li class="nav-item me-3">
+                            <span class="nav-link disabled">Bienvenido, {{ user.username }}!</span>
+                        </li>
+
                         {% if user.is_superuser %}
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'productos:listar_productos' %}">Lista de Productos</a></li>
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'pedidos:listar_pedidos' %}">Pedidos</a></li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'productos:listar_productos' %}active{% endif %}" href="{% url 'productos:listar_productos' %}">Lista de Productos</a>
+                        </li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'pedidos:listar_pedidos' %}active{% endif %}" href="{% url 'pedidos:listar_pedidos' %}">Pedidos</a>
+                        </li>
                         {% endif %}
-                        
+
                         <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}" style="display:inline;">
                                 {% csrf_token %}
@@ -44,8 +59,12 @@
                             </form>
                         </li>
                         {% else %}
-                        <li class="nav-item me-3"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a></li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'registro' %}active{% endif %}" href="{% url 'registro' %}">Registrarse</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Iniciar Sesión</a>
+                        </li>
                         {% endif %}
                     </ul>
                 </div>

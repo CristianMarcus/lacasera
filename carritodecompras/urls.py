@@ -12,7 +12,7 @@ urlpatterns = [
     path('incrementar/<int:producto_id>/', views.incrementar_cantidad_producto, name='incrementar_cantidad_producto'),  # Incrementar cantidad
 
     # Actualización de contacto
-    path('actualizar_contacto_pedido/<int:pedido_id>/', views.actualizar_contacto_pedido, name='actualizar_contacto_pedido'),
+    path('actualizar_contacto/<int:pedido_id>/', views.actualizar_contacto, name='actualizar_contacto'),
 
     # Rutas para sesiones (usuarios no autenticados)
     path('sesion/', views.ver_carrito_sesion, name='ver_carrito_sesion'),

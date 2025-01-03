@@ -11,15 +11,48 @@ header {
     font-size: 20px;
 
 }
+strong {
+    color: rgb(33, 145, 236);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    border-radius: 10px;
+}
+p {
+    color: rgb(33, 145, 236);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    border-radius: 10px;
+}
+h1 {
+    color: #ffdedeef;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 50px;
+    border-radius: 10px;
+}
+th {
+    background-color: rgb(22, 22, 121);
+    color: white;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    border-radius: 10px;
+
+}
+td {
+    background-color: rgb(22, 22, 121);
+    color: white;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px;
+    border-radius: 10px;
+}
+
 
 
 /* General Body Styles */
 body {
-    background-image: url('/static/productos/img/40a13a4df7150f3e57b358a92741ea43.jpg');
     background-size: cover; /* Ajusta la imagen para cubrir todo el área */
     background-position: center; /* Centra la imagen */
     background-repeat: no-repeat; /* Evita que la imagen se repita */
-    background-color: white; 
+    background-color: rgb(29, 21, 77); 
     margin: 1;
     font-family: Arial, sans-serif;
     color: blue;
@@ -79,7 +112,7 @@ a {
 }
 li{
     text-decoration: none;
-    color: black;
+    color: rgb(243, 159, 2);
     font-weight: bolder;
 }
 
@@ -127,6 +160,7 @@ ul.menu li a:hover {
 /* Estilo para las tarjetas de productos */
 .card {
     background-color: black;
+    
     border: 2px solid gray; /* Borde color ladrillo */
     border-radius: 10px;
     overflow: hidden;
@@ -148,7 +182,7 @@ ul.menu li a:hover {
 
 .card-body {
     padding: 20px;
-    background-color: #f5f5f5;
+    background-color: #c4c732;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

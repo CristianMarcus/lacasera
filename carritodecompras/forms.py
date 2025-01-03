@@ -1,6 +1,6 @@
 from django import forms
 from .models import Carrito, LineaCarrito
-
+from pedidos.models import Pedido
 
 
 class CarritoForm(forms.ModelForm):
@@ -13,9 +13,24 @@ class LineaCarritoForm(forms.ModelForm):
         model = LineaCarrito
         fields = ['carrito', 'producto', 'cantidad']
 
-class PedidoContactoForm(forms.Form):
-    direccion = forms.CharField(max_length=255, required=True, label="Dirección")
-    telefono = forms.CharField(max_length=20, required=True, label="Teléfono")
+
+
+from django import forms
+from pedidos.models import Pedido 
+
+class PedidoContactoForm(forms.ModelForm):
+    class Meta:
+        model = Pedido
+        fields = ['direccion', 'telefono']  # Asegúrate de incluir los campos a actualizar
+        labels = {
+            'direccion': 'Dirección',
+            'telefono': 'Teléfono',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+   
 
 class AgregarCarritoForm(forms.Form):
     cantidad_total = forms.IntegerField(min_value=1, required=False, label='Cantidad Total')

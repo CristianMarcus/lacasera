@@ -17,8 +17,9 @@ class Usuario(AbstractUser):
         verbose_name='user permissions',
     )
     
-    address = models.CharField('Dirección', max_length=255, blank=False, null=False)
-    phone_number = models.CharField('Número de teléfono', max_length=15, blank=False, null=False)
+    address = models.CharField('Dirección', max_length=255, default='Sin dirección')
+    phone_number = models.CharField('Número de teléfono', max_length=15, default='0000000000')
+
 
     class Meta:
         verbose_name = 'Usuario'

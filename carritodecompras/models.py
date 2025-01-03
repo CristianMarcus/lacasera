@@ -4,9 +4,8 @@ from productos.models import Producto
 from django.utils import timezone
 
 
-# Modelo para el carrito
 class Carrito(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     creado = models.DateTimeField(default=timezone.now)
 
     @property
@@ -19,6 +18,9 @@ class Carrito(models.Model):
         Agrega un producto al carrito o incrementa su cantidad.
         Si la línea no existe, la crea con el precio del producto actual.
         """
+        if cantidad > producto.stock_disponible:
+            raise ValueError("Cantidad supera el stock disponible.")
+
         linea, creada = self.lineas.get_or_create(
             producto=producto,
             defaults={'cantidad': cantidad, 'precio': producto.precio}
@@ -26,6 +28,10 @@ class Carrito(models.Model):
         if not creada:
             # Incrementa la cantidad si ya existe
             linea.incrementar_cantidad(cantidad)
+        # Verifica y actualiza el precio si ha cambiado
+        if linea.precio != producto.precio:
+            linea.precio = producto.precio
+            linea.save()
         return linea
 
     def eliminar_producto(self, producto, cantidad=1):
@@ -50,10 +56,9 @@ class Carrito(models.Model):
         return f"Carrito {self.id} de {self.usuario.username}"
 
 
-# Modelo para las líneas del carrito
 class LineaCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='lineas', on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    producto = models.ForeignKey('productos.Producto', on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
     precio = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 

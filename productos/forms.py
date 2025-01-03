@@ -5,6 +5,9 @@ class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = ['nombre', 'descripcion', 'precio', 'imagen', 'disponible']
+        widgets = {
+            'precio': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
+        }
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.contrib.auth.views import LoginView
-from django.contrib import messages  # Importa el framework de mensajes
+from django.contrib import messages  # Importa el framework de mensajes  # Importa el modelo Pedido
+from pedidos.models import Pedido  # Importa correctamente desde la app pedidos
 
 class CustomLoginView(LoginView):
     template_name = 'usuarios/login.html'  # El archivo HTML que contiene el formulario de inicio de sesión
@@ -41,19 +42,26 @@ from django.contrib import messages
 
 @login_required
 def actualizar_contacto(request):
-    user = request.user  # Usuario autenticado
+    user = request.user
     if request.method == 'POST':
-        form = UsuarioUpdateForm(request.POST, instance=user)  # Pasamos el usuario al formulario
+        form = UsuarioUpdateForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()  # Guarda los datos actualizados del usuario
+            form.save()
+            # Actualizar los pedidos pendientes con los nuevos datos
+            Pedido.objects.filter(cliente=user, estado="Pendiente").update(
+                direccion=user.address,
+                telefono=user.phone_number
+            )
             messages.success(request, "Información actualizada con éxito.")
-            return redirect('carrito')  # Redirige al carrito o a la página deseada
+            return redirect('carritodecompras:ver_carrito')
         else:
             messages.error(request, "Hubo un error al actualizar la información.")
     else:
-        form = UsuarioUpdateForm(instance=user)  # Cargamos el formulario con los datos del usuario actual
+        form = UsuarioUpdateForm(instance=user)
 
     return render(request, 'usuarios/actualizar_contacto.html', {'form': form})
+
+
 
 
 

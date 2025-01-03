@@ -132,3 +132,4 @@ STRIPE_PUBLISHABLE_KEY = 'tu_publishable_key'
 # Claves de API de MercadoPago
 MERCADOPAGO_PUBLIC_KEY = 'tu_public_key'
 MERCADOPAGO_ACCESS_TOKEN = 'tu_access_token'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa la base de datos para almacenar las sesiones

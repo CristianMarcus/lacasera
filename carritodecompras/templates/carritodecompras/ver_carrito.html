@@ -29,31 +29,10 @@
         <tbody>
             {% for linea in lineas %}
             <tr>
-                <td>
-                    {% if linea.producto %}
-                    {{ linea.producto.nombre }}
-                    {% else %}
-                    Producto eliminado
-                    {% endif %}
-                </td>
-                <td>
-                    <!-- Incrementar y Disminuir cantidad -->
-                    <form method="POST" action="{% url 'carritodecompras:disminuir_cantidad_producto' linea.producto.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-secondary btn-sm">-</button>
-                    </form>
-                    {{ linea.cantidad }}
-                    <form method="POST" action="{% url 'carritodecompras:incrementar_cantidad_producto' linea.producto.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-secondary btn-sm">+</button>
-                    </form>
-                </td>
-                <td>
-                    ${{ linea.precio_unidad|floatformat:2 }}
-                </td>
-                <td>
-                    ${{ linea.get_subtotal|floatformat:2 }}
-                </td>
+                <td>{{ linea.producto.nombre }}</td>
+                <td>{{ linea.cantidad }}</td>
+                <td>${{ linea.precio|floatformat:2 }}</td>
+                <td>${{ linea.get_subtotal|floatformat:2 }}</td>
                 <td>
                     <form method="POST" action="{% url 'carritodecompras:eliminar_producto' linea.producto.id %}" style="display:inline;">
                         {% csrf_token %}
@@ -65,28 +44,22 @@
         </tbody>
     </table>
 
-    <!-- Totales -->
-    <div class="totales">
-        <h4>Total de artículos: {{ total_items }}</h4>
-        <h4>Total a pagar: ${{ carrito.total|floatformat:2 }}</h4>
-    </div>
-
-    <!-- Botones de pago -->
+    <!-- Botón para actualizar contacto -->
     <div class="botones-de-pago d-flex justify-content-between flex-wrap">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#actualizarContactoPedidoModal">Actualizar Contacto</button>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#paymentModal">Confirmar Pedido</button>
     </div>
 
     <!-- Modal de Actualización de Contacto -->
-    <div id="actualizarContactoPedidoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="actualizarContactoPedidoModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div id="actualizarContactoPedidoModal" class="modal fade" tabindex="-1" aria-labelledby="actualizarContactoPedidoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="actualizarContactoPedidoModalLabel">Actualiza tu Información de Contacto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{% url 'carritodecompras:actualizar_contacto_pedido' pedido.id %}" id="contactoPedidoForm">
+                    <form method="post" action="{% url 'carritodecompras:actualizar_contacto' pedido.id %}">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <button type="submit" class="btn btn-primary">Guardar y proceder</button>
@@ -114,9 +87,9 @@
             </div>
         </div>
     </div>
+
     {% else %}
     <p>El carrito está vacío. <a href="{% url 'productos:menu' %}">Continuar Comprando</a></p>
     {% endif %}
-    <a href="{% url 'productos:menu' %}" class="btn btn-secondary mt-3">Continuar Comprando</a>
 </div>
 {% endblock %}

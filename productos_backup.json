@@ -1,0 +1,158 @@
+[
+{
+  "model": "productos.producto",
+  "pk": 1,
+  "fields": {
+    "nombre": "empanadas",
+    "precio": "14000.00",
+    "descripcion": "caseras",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/empanadasencaja.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 2,
+  "fields": {
+    "nombre": "especial con huevo",
+    "precio": "15000.00",
+    "descripcion": "esp huevo",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/especialconhuevofrito_vqVHEJ0.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 7,
+  "fields": {
+    "nombre": "muzzarella",
+    "precio": "7000.00",
+    "descripcion": "6565",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/muzzaencajaLacasera.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 8,
+  "fields": {
+    "nombre": "calabresa",
+    "precio": "13000.00",
+    "descripcion": "rodajas de longaniza",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/calabresaLacasera_aLPZFz4.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 9,
+  "fields": {
+    "nombre": "muzza con fritas",
+    "precio": "14000.00",
+    "descripcion": "muzzarella y fritas,tomate,oregano,aceitunas",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/muzzaconfritas_7CMuoug.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 10,
+  "fields": {
+    "nombre": "pizza napolitana",
+    "precio": "12000.00",
+    "descripcion": "ajo,muzza,perejil,aceitunas,tomate",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/napoconperejil_vnNq0jS.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 11,
+  "fields": {
+    "nombre": "hamburgesa con baccon",
+    "precio": "7000.00",
+    "descripcion": "medallon de carne,panceta,chedar,etc",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/burgerconbaccon_7qlF7rV.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 12,
+  "fields": {
+    "nombre": "bandeja de papas",
+    "precio": "4500.00",
+    "descripcion": "porcion de papas",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/bandejapapas_s4mggbc.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 13,
+  "fields": {
+    "nombre": "Pastel de Papas",
+    "precio": "6500.00",
+    "descripcion": "papas premiun,carne picada especial de ternera,queso muzzarella y rayado",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/pasteldeappasLacasera_3NzVn2a.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 18,
+  "fields": {
+    "nombre": "milaNapo",
+    "precio": "15000.00",
+    "descripcion": "milanesa de ternera con papass",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "static/productos/milanapoconpapasx1_KLfUNPY.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 19,
+  "fields": {
+    "nombre": "nochedepizzas",
+    "precio": "8000.00",
+    "descripcion": "promospizzas",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "media/productos/nochedepizzaschedarpancetamitadeseleccion.jpeg"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 20,
+  "fields": {
+    "nombre": "burgerok",
+    "precio": "8000.00",
+    "descripcion": "cebolla caramelizada",
+    "disponible": true,
+    "stock": 0,
+    "categoria": null,
+    "imagen": "media/productos/burgercebollacaramelizada.jpeg"
+  }
+}
+]
